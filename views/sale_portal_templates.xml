@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_orders_inherited" inherit_id="sale.portal_my_orders" name="My Sales Orders Inherited">
+        <!-- This adds the new table headers at the end of the row -->
+        <xpath expr="//thead/tr/th[last()]" position="after">
+            <th class="text-start">Status</th>
+            <th class="text-start">Expected Delivery</th>
+            <th class="text-start">Manufacturing Orders</th>
+            <th class="text-start">Delivery Orders</th>
+        </xpath>
+
+        <!-- This adds the corresponding cells to the end of the table body row -->
+        <xpath expr="//tbody/tr/td[last()]" position="after">
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </xpath>
+    </template>
+</odoo>

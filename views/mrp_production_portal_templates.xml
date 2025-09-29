@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template for listing Manufacturing Orders -->
+    <template id="portal_my_mrp_productions" name="My Manufacturing Orders" customize_show="True">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_back_in_edit_mode">
+                <t t-raw="0"/>
+            </t>
+
+            <div id="wrap" class="oe_structure o_portal_my_home">
+                <div class="container">
+                    <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>
+                    <h1 class="mb-3">My Manufacturing Orders</h1>
+
+                    <t t-if="not mrp_productions">
+                        <p>There are no manufacturing orders to display.</p>
+                    </t>
+                    <t t-if="mrp_productions">
+                        <div class="table-responsive">
+                            <table class="table table-hover o_portal_my_mrp_productions_table">
+                                <thead>
+                                    <tr class="active">
+                                        <th>Reference</th>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Completion %</th>
+                                        <th class="text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="mrp_productions" t-as="mo">
+                                        <tr>
+                                            <td><a t-attf-href="/my/manufacturing/#{mo.id}"><t t-esc="mo.name"/></a></td>
+                                            <td><t t-esc="mo.product_id.display_name"/></td>
+                                            <td><t t-esc="mo.product_qty"/> <t t-esc="mo.product_uom_id.name"/></td>
+                                            <td><t t-esc="mo.state"/></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar" role="progressbar" t-att-style="'width: %s%%;' % mo.workorder_completion_percentage" t-att-aria-valuenow="mo.workorder_completion_percentage" aria-valuemin="0" aria-valuemax="100">
+                                                        <t t-esc="'%.2f' % mo.workorder_completion_percentage"/>%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <a t-attf-href="/my/manufacturing/#{mo.id}" class="btn btn-primary btn-sm">View</a>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Template for Manufacturing Order Detail Page -->
+    <template id="portal_my_mrp_production_detail" name="Manufacturing Order Detail" customize_show="True">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_back_in_edit_mode">
+                <t t-raw="0"/>
+            </t>
+
+            <div id="wrap" class="oe_structure">
+                <div class="container">
+                    <h1 class="mb-3">Manufacturing Order: <span t-field="mrp_production.name"/></h1>
+
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Product:</strong> <span t-field="mrp_production.product_id.display_name"/></p>
+                                    <p><strong>Quantity:</strong> <span t-field="mrp_production.product_qty"/> <span t-field="mrp_production.product_uom_id.name"/></p>
+                                    <p><strong>Status:</strong> <span t-field="mrp_production.state"/></p>
+                                    <p><strong>Scheduled Date:</strong> <span t-field="mrp_production.date_planned_start"/></p>
+                                    <p><strong>Expected Finish Date:</strong> <span t-field="mrp_production.date_planned_finished"/></p>
+                                    <p><strong>Estimated Delivery Date:</strong> <span t-field="mrp_production.expected_delivery_date"/></p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Work Order Progress</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress" style="height: 30px;">
+                                        <div class="progress-bar" role="progressbar" t-att-style="'width: %s%%;' % mrp_production.workorder_completion_percentage" t-att-aria-valuenow="mrp_production.workorder_completion_percentage" aria-valuemin="0" aria-valuemax="100">
+                                            <t t-esc="'%.2f' % mrp_production.workorder_completion_percentage"/>%
+                                        </div>
+                                    </div>
+                                    <p class="mt-2 text-muted">Total Work Orders: <t t-esc="len(mrp_production.workorder_ids)"/></p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Work Orders</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="not mrp_production.workorder_ids">
+                                        <p>No work orders for this manufacturing order.</p>
+                                    </t>
+                                    <t t-if="mrp_production.workorder_ids">
+                                        <table class="table table-sm table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Operation</th>
+                                                    <th>Work Center</th>
+                                                    <th>Status</th>
+                                                    <th>Duration</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="mrp_production.workorder_ids" t-as="workorder">
+                                                    <tr>
+                                                        <td><t t-esc="workorder.name"/></td>
+                                                        <td><t t-esc="workorder.workcenter_id.name"/></td>
+                                                        <td><t t-esc="workorder.state"/></td>
+                                                        <td><t t-esc="'%.2f' % workorder.duration"/> min</td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <!-- Sidebar content if needed -->
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="/my/manufacturing" class="btn btn-secondary">Back to Manufacturing Orders</a>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_back_in_edit_mode_remove_close_button" name="Portal Back to Edit Mode Remove Close Button" inherit_id="portal.portal_back_in_edit_mode" priority="1">
+        <xpath expr="//button[@class='btn-close']" position="replace"/>
+    </template>
+</odoo>

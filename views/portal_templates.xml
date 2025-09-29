@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="portal_my_home_menu_dashboard" name="Portal Dashboard Menu" inherit_id="portal.portal_my_home" priority="10">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+                <t t-call="portal.portal_docs_entrypoint">
+                    <t t-set="title">Dashboard</t>
+                    <t t-set="url" t-value="/my/dashboard"/>
+                    <t t-set="placeholder_count" t-value="0"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_menu_orders" name="Portal Orders Menu" inherit_id="portal.portal_my_home" priority="20">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+                <t t-call="portal.portal_docs_entrypoint">
+                    <t t-set="title">Orders</t>
+                    <t t-set="url" t-value="/my/orders"/>
+                    <t t-set="placeholder_count" t-value="0"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_menu_manufacturing" name="Portal Manufacturing Menu" inherit_id="portal.portal_my_home" priority="30">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+                <t t-call="portal.portal_docs_entrypoint">
+                    <t t-set="title">Manufacturing</t>
+                    <t t-set="url" t-value="/my/manufacturing"/>
+                    <t t-set="placeholder_count" t-value="0"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_menu_delivery" name="Portal Delivery Menu" inherit_id="portal.portal_my_home" priority="40">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+                <t t-call="portal.portal_docs_entrypoint">
+                    <t t-set="title">Delivery</t>
+                    <t t-set="url" t-value="/my/delivery"/>
+                    <t t-set="placeholder_count" t-value="0"/>
+                </t>
+            </xpath>
+        </template>
+
+        <template id="portal_my_home_menu_payments" name="Portal Payments Menu" inherit_id="portal.portal_my_home" priority="50">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+                <t t-call="portal.portal_docs_entrypoint">
+                    <t t-set="title">Payments</t>
+                    <t t-set="url" t-value="/my/payments"/>
+                    <t t-set="placeholder_count" t-value="0"/>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- Add navigation tabs to the portal layout -->
+        <template id="portal_my_home_nav_tabs" name="Portal My Home Navigation Tabs" inherit_id="portal.portal_my_home" priority="100">
+            <xpath expr="//div[hasclass('o_portal_my_home')]" position="replace">
+                <div class="o_portal_my_home">
+                    <div class="container">
+                        <ul class="nav nav-tabs justify-content-center mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link" t-att-class="'active' if page_name == 'dashboard' else ''" href="/my/dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" t-att-class="'active' if page_name == 'orders' else ''" href="/my/orders">Orders</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" t-att-class="'active' if page_name == 'mrp_production' else ''" href="/my/manufacturing">Manufacturing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" t-att-class="'active' if page_name == 'stock_picking' else ''" href="/my/delivery">Delivery</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" t-att-class="'active' if page_name == 'account_payment' else ''" href="/my/payments">Payments</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>
+                </div>
+            </xpath>
+        </template>
+
+        <template id="dealer_portal_breadcrumbs_always_home_icon" name="Dealer Portal Breadcrumbs Always Home Icon" inherit_id="portal.portal_breadcrumbs" priority="1">
+            <xpath expr="//ol" position="replace">
+                <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                    <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                    <li t-if="page_name == 'my_details'" class="breadcrumb-item">Details</li>
+                    <t t-if="page_name != 'home' and page_name != 'my_details'">
+                        <li class="breadcrumb-item active">
+                            <t t-esc="page_name"/>
+                        </li>
+                    </t>
+                </ol>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

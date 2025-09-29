@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_orders_inherit" name="Portal My Orders Inherit" inherit_id="sale.portal_my_orders" customize_show="True">
+        <xpath expr="//thead/tr/th[last()]" position="after">
+            <th class="text-start">Status</th>
+            <th class="text-start">Expected Delivery</th>
+            <th class="text-start">Manufacturing Orders</th>
+            <th class="text-start">Delivery Orders</th>
+        </xpath>
+        <xpath expr="//t[@t-foreach='orders']/tr/td[last()]" position="after">
+            <td>
+                <span t-field="order.current_status"/>
+            </td>
+            <td>
+                <span t-field="order.expected_delivery_date"/>
+            </td>
+            <td>
+                <t t-if="order.procurement_group_id and order.procurement_group_id.mrp_production_ids">
+                    <a t-attf-href="/my/manufacturing?sale_order_id=#{order.id}" class="btn btn-sm btn-primary">View MOs</a>
+                </t>
+                <t t-else="">
+                    <span>N/A</span>
+                </t>
+            </td>
+            <td>
+                <t t-if="order.picking_ids">
+                    <a t-attf-href="/my/delivery?sale_order_id=#{order.id}" class="btn btn-sm btn-primary">View DOs</a>
+                </t>
+                <t t-else="">
+                    <span>N/A</span>
+                </t>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="portal_my_order_page_inherit" name="Portal My Order Page Inherit" inherit_id="sale.sale_order_portal_template" customize_show="True">
+        <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' o_portal_sale_sidebar ')]" position="inside">
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Status Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Status:</strong> <span t-field="sale_order.current_status"/></p>
+                            <p><strong>Expected Delivery Date:</strong> <span t-field="sale_order.expected_delivery_date"/></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Financial Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Total Order Value:</strong> <span t-field="sale_order.amount_total"/></p>
+                            <p><strong>Payments Made:</strong> <span t-field="sale_order.payments_made"/></p>
+                            <p><strong>Balance Due:</strong> <span t-field="sale_order.balance_due"/></p>
+                            <p><strong>Payment Status:</strong> <span t-field="sale_order.payment_status"/></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_orders_add_spinner" name="Portal My Orders Add Spinner" inherit_id="sale.portal_my_orders" priority="1">
+        <xpath expr="//t[@t-call='portal.portal_layout']" position="inside">
+            <div class="o_portal_my_home">
+                <xpath expr="//t[@t-set='breadcrumbs_searchbar']" position="after">
+                    <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>
+                </xpath>
+            </div>
+        </xpath>
+    </template>
+</odoo>

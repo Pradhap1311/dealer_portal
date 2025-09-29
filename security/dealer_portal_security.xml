@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Dealer Portal User Group -->
+        <record id="group_dealer_portal_user" model="res.groups">
+            <field name="name">Dealer Portal / User</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">The user can access the dealer portal functionalities.</field>
+        </record>
+
+        <!-- Record rules for dealer portal users -->
+        <record id="sale_order_dealer_portal_rule" model="ir.rule">
+            <field name="name">Sale Order Dealer Portal User</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="mrp_production_dealer_portal_rule" model="ir.rule">
+            <field name="name">Manufacturing Order Dealer Portal User</field>
+            <field name="model_id" ref="mrp.model_mrp_production"/>
+            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="stock_picking_dealer_portal_rule" model="ir.rule">
+            <field name="name">Delivery Order Dealer Portal User</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="account_payment_dealer_portal_rule" model="ir.rule">
+            <field name="name">Payment Dealer Portal User</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

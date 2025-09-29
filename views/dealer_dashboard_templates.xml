@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="dealer_dashboard" name="Dealer Dashboard" customize_show="True">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <div class="alert alert-info" role="alert">
+                Welcome to your Dealer Dashboard.
+                <a href="/my/home" class="alert-link fw-bold">Back to Portal Home</a>
+            </div>
+
+            <div id="wrap" class="oe_structure">
+                <div class="container">
+                    <h1 class="mb-3">Dealer Dashboard</h1>
+                    <div class="row content-group">
+                        <!-- Total Orders Placed -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders Placed</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="total_orders"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-shopping-cart fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Orders in Production -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Orders in Production</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="orders_in_production"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-industry fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivered Orders -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Delivered Orders</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="delivered_orders"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-truck fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Outstanding Payments -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Outstanding Payments</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="outstanding_payments"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-money fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- You can add more sections here, e.g., recent orders, production status, etc. -->
+
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
