@@ -14,9 +14,10 @@ class AccountPaymentPortal(CustomerPortal):
             ('partner_id', '=', partner.id)
         ])
         values['account_payment_count'] = account_payment_count
+        values['default_url_account_payments'] = '/my/account_payments'
         return values
 
-    @http.route(['/my/payments', '/my/payments/page/<int:page>'], type='http', auth="user", website=True)
+    @http.route(['/my/account_payments', '/my/account_payments/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_account_payments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
@@ -67,7 +68,7 @@ class AccountPaymentPortal(CustomerPortal):
         account_payment_count = AccountPayment.search_count(domain)
         # pager
         pager = portal_pager(
-            url="/my/payments",
+            url="/my/account_payments",
             total=account_payment_count,
             page=page,
             step=self._items_per_page,
@@ -81,7 +82,7 @@ class AccountPaymentPortal(CustomerPortal):
             'account_payments': account_payments,
             'page_name': 'account_payment',
             'pager': pager,
-            'default_url': '/my/payments',
+            'default_url': '/my/account_payments',
             'sortby': sortby,
             'sort_by_selection': sort_by_selection,
             'filterby': filterby,
@@ -92,9 +93,9 @@ class AccountPaymentPortal(CustomerPortal):
             'paid_invoice_count': paid_invoice_count,
             'cancel_invoice_count': cancel_invoice_count,
         })
-        return request.render("dealer_portal.portal_my_payments", values)
+        return request.render("dealer_portal.portal_my_account_payments_list", values)
 
-    @http.route(['/my/payments/<int:payment_id>'], type='http', auth="user", website=True)
+    @http.route(['/my/account_payments/<int:payment_id>'], type='http', auth="user", website=True)
     def portal_my_account_payment_detail(self, payment_id, **kw):
         try:
             account_payment = request.env['account.payment'].browse([payment_id]).sudo().read(['name', 'partner_id', 'date', 'amount', 'currency_id', 'state', 'journal_id'])[0]
@@ -112,4 +113,4 @@ class AccountPaymentPortal(CustomerPortal):
             'account_payment': account_payment,
             'page_name': 'account_payment_detail',
         })
-        return request.render("dealer_portal.portal_my_payment_detail", values)
+        return request.render("dealer_portal.portal_my_account_payment_detail", values)
