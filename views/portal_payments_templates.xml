@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_payments" name="My Payments">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <div id="wrap" class="oe_structure">
+                <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                    <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                    <li class="breadcrumb-item active">My Payments</li>
+                </ol>
+                <div class="container">
+                    <t t-call="dealer_portal.payment_status_cards"/>
+
+                    <div t-if="filterby" class="mt-4">
+                        <h3 class="mb-3" t-esc="current_filter_name"/>
+                        <div t-if="account_payments" class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Journal</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="account_payments" t-as="payment">
+                                        <tr>
+                                            <td><a t-attf-href="/my/payments/#{payment.id}"><t t-esc="payment.name"/></a></td>
+                                            <td><span t-field="payment.date"/></td>
+                                            <td><span t-field="payment.amount" t-options='{"widget": "monetary", "display_currency": payment.currency_id}'/></td>
+                                            <td><span t-field="payment.journal_id.name"/></td>
+                                            <td><span t-field="payment.state"/></td>
+                                            <td><a t-attf-href="/my/payments/#{payment.id}" class="btn btn-primary btn-sm">View</a></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div t-else="" class="alert alert-info mt-3" role="alert">
+                            No payments found for this status.
+                        </div>
+                        <div t-if="pager" class="o_portal_pager text-center">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </div>
+                    <div t-else="" class="alert alert-info mt-3" role="alert">
+                        Select a status card above to view payments.
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

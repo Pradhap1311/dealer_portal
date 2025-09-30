@@ -65,6 +65,250 @@ class DealerPortal(CustomerPortal):
         })
         return values
 
+    @http.route(['/my/manufacturing', '/my/manufacturing/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_manufacturing_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+
+        domain = [('partner_id', '=', partner.id)]
+
+        if filterby == 'draft':
+            domain += [('state', '=', 'draft')]
+            values['current_filter_name'] = 'Draft Manufacturing Orders'
+        elif filterby == 'confirmed':
+            domain += [('state', '=', 'confirmed')]
+            values['current_filter_name'] = 'Confirmed Manufacturing Orders'
+        elif filterby == 'progress':
+            domain += [('state', '=', 'progress')]
+            values['current_filter_name'] = 'In Progress Manufacturing Orders'
+        elif filterby == 'done':
+            domain += [('state', '=', 'done')]
+            values['current_filter_name'] = 'Done Manufacturing Orders'
+        elif filterby == 'cancel':
+            domain += [('state', '=', 'cancel')]
+            values['current_filter_name'] = 'Cancelled Manufacturing Orders'
+        else:
+            values['current_filter_name'] = 'All Manufacturing Orders'
+
+        # Count for status cards
+        values['draft_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'draft')])
+        values['confirmed_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'confirmed')])
+        values['progress_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'progress')])
+        values['done_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'done')])
+        values['cancel_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'cancel')])
+
+        # Paging
+        mrp_productions_count = request.env['mrp.production'].sudo().search_count(domain)
+        pager = request.website.pager(url='/my/manufacturing', total=mrp_productions_count, page=page, step=self._items_per_page)
+        mrp_productions = request.env['mrp.production'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+
+        values.update({
+            'mrp_productions': mrp_productions,
+            'page_name': 'manufacturing',
+            'pager': pager,
+            'default_url': '/my/manufacturing',
+            'searchbar_sortings': self._get_mrp_sortings(), # Need to define this method
+            'sortby': sortby,
+            'filterby': filterby,
+        })
+        return request.render("dealer_portal.portal_my_manufacturing_orders", values)
+
+    @http.route(['/my/manufacturing/<int:mo_id>'], type='http', auth="user", website=True)
+    def portal_my_manufacturing_order(self, mo_id, **kw):
+        mrp_production = request.env['mrp.production'].sudo().browse(mo_id)
+        if not mrp_production.exists():
+            return request.redirect('/my/manufacturing')
+
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'mrp_production': mrp_production,
+            'page_name': 'manufacturing_order_page',
+        })
+        return request.render("dealer_portal.portal_my_manufacturing_order_page", values)
+
+    @http.route(['/my/delivery', '/my/delivery/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_delivery_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+
+        domain = [('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing')]
+
+        if filterby == 'draft':
+            domain += [('state', '=', 'draft')]
+            values['current_filter_name'] = 'Draft Deliveries'
+        elif filterby == 'waiting':
+            domain += [('state', '=', 'waiting')]
+            values['current_filter_name'] = 'Waiting Deliveries'
+        elif filterby == 'assigned':
+            domain += [('state', '=', 'assigned')]
+            values['current_filter_name'] = 'Ready Deliveries'
+        elif filterby == 'done':
+            domain += [('state', '=', 'done')]
+            values['current_filter_name'] = 'Done Deliveries'
+        elif filterby == 'cancel':
+            domain += [('state', '=', 'cancel')]
+            values['current_filter_name'] = 'Cancelled Deliveries'
+        else:
+            values['current_filter_name'] = 'All Deliveries'
+
+        # Count for status cards
+        values['draft_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'draft')])
+        values['waiting_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'waiting')])
+        values['ready_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'assigned')])
+        values['done_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'done')])
+        values['cancel_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
+
+        # Paging
+        delivery_orders_count = request.env['stock.picking'].sudo().search_count(domain)
+        pager = request.website.pager(url='/my/delivery', total=delivery_orders_count, page=page, step=self._items_per_page)
+        delivery_orders = request.env['stock.picking'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+
+        values.update({
+            'delivery_orders': delivery_orders,
+            'page_name': 'delivery',
+            'pager': pager,
+            'default_url': '/my/delivery',
+            'searchbar_sortings': self._get_delivery_sortings(), # Need to define this method
+            'sortby': sortby,
+            'filterby': filterby,
+        })
+        return request.render("dealer_portal.portal_my_delivery_orders", values)
+
+    @http.route(['/my/delivery/<int:do_id>'], type='http', auth="user", website=True)
+    def portal_my_delivery_order(self, do_id, **kw):
+        delivery_order = request.env['stock.picking'].sudo().browse(do_id)
+        if not delivery_order.exists():
+            return request.redirect('/my/delivery')
+
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'delivery_order': delivery_order,
+            'page_name': 'delivery_order_page',
+        })
+        return request.render("dealer_portal.portal_my_delivery_order_page", values)
+
+    @http.route(['/my/payments', '/my/payments/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_payments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+
+        domain = [('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice')]
+
+        if filterby == 'draft':
+            domain += [('state', '=', 'draft')]
+            values['current_filter_name'] = 'Draft Invoices'
+        elif filterby == 'open':
+            domain += [('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])]
+            values['current_filter_name'] = 'Open Invoices'
+        elif filterby == 'paid':
+            domain += [('payment_state', '=', 'paid')]
+            values['current_filter_name'] = 'Paid Invoices'
+        elif filterby == 'cancel':
+            domain += [('state', '=', 'cancel')]
+            values['current_filter_name'] = 'Cancelled Invoices'
+        else:
+            values['current_filter_name'] = 'All Invoices'
+
+        # Count for status cards
+        values['draft_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
+        values['open_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
+        values['paid_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
+        values['cancel_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
+
+        # Paging
+        invoices_count = request.env['account.move'].sudo().search_count(domain)
+        pager = request.website.pager(url='/my/payments', total=invoices_count, page=page, step=self._items_per_page)
+        invoices = request.env['account.move'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+
+        values.update({
+            'invoices': invoices,
+            'page_name': 'payments',
+            'pager': pager,
+            'default_url': '/my/payments',
+            'searchbar_sortings': self._get_payment_sortings(), # Need to define this method
+            'sortby': sortby,
+            'filterby': filterby,
+        })
+        return request.render("dealer_portal.portal_my_payments", values)
+
+    @http.route(['/my/payments/<int:invoice_id>'], type='http', auth="user", website=True)
+    def portal_my_payment(self, invoice_id, **kw):
+        invoice = request.env['account.move'].sudo().browse(invoice_id)
+        if not invoice.exists():
+            return request.redirect('/my/payments')
+
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'invoice': invoice,
+            'page_name': 'payment_page',
+        })
+        return request.render("dealer_portal.portal_my_payment_page", values)
+
+    def _get_payment_sortings(self):
+        return {
+            'date': {'label': 'Newest', 'order': 'invoice_date desc'},
+            'name': {'label': 'Reference', 'order': 'name asc'},
+        }
+
+    def _get_delivery_sortings(self):
+        return {
+            'date': {'label': 'Newest', 'order': 'create_date desc'},
+            'name': {'label': 'Reference', 'order': 'name asc'},
+        }
+
+    def _get_mrp_sortings(self):
+        return {
+            'date': {'label': 'Newest', 'order': 'create_date desc'},
+            'name': {'label': 'Reference', 'order': 'name asc'},
+        }
+
+    @http.route(['/my/orders', '/my/orders/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
+        values = self._prepare_sale_portal_rendering_values(page, date_begin, date_end, sortby, filterby=filterby, **kw)
+        partner = request.env.user.partner_id
+        SaleOrder = request.env['sale.order']
+
+        domain = values.get('domain', [])
+        order = values.get('order', 'create_date desc') # Ensure order is set
+
+        _logger.info("Portal My Orders - Domain: %s, Order: %s", domain, order)
+
+        # Paging
+        quotations_count = SaleOrder.search_count(domain)
+        pager = request.website.pager(
+            url="/my/orders",
+            total=quotations_count,
+            page=page,
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search}
+        )
+
+        # Content according to pager and domain
+        orders = SaleOrder.search(domain, order=values.get('order'), limit=self._items_per_page, offset=pager['offset'])
+
+        values.update({
+            'orders': orders,
+            'page_name': 'sales_orders',
+            'pager': pager,
+            'default_url': '/my/orders',
+            'searchbar_sortings': self._get_sale_sortings(),
+            'sortby': sortby,
+            'filterby': filterby,
+            'search': search,
+            'quote_count': values.get('quote_count'),
+            'quote_sent_count': values.get('quote_sent_count'),
+            'confirmed_orders_count': values.get('confirmed_orders_count'),
+            'cancelled_orders_count': values.get('cancelled_orders_count'),
+        })
+        return request.render("dealer_portal.portal_my_sales_orders", values)
+
+    def _get_sale_sortings(self):
+        return {
+            'date': {'label': 'Newest', 'order': 'create_date desc'},
+            'name': {'label': 'Reference', 'order': 'name asc'},
+            'amount': {'label': 'Amount', 'order': 'amount_total desc'},
+        }
+
     def _prepare_sale_portal_rendering_values(
         self, page=1, date_begin=None, date_end=None, sortby=None, quotation_page=False, filterby=None, **kwargs
     ):
@@ -72,7 +316,7 @@ class DealerPortal(CustomerPortal):
         partner = request.env.user.partner_id
 
         if filterby == 'quotation':
-            domain = [('partner_id', '=', partner.id), ('state', '=', 'draft')]
+            domain = [('partner_id', '=', partner.id), ('state', 'in', ('draft', 'sent'))]
             values['current_filter_name'] = 'Quotations' # New variable for page title
         elif filterby == 'sent':
             domain = [('partner_id', '=', partner.id), ('state', '=', 'sent')]
@@ -91,6 +335,19 @@ class DealerPortal(CustomerPortal):
 
         # Update the domain in values to reflect the filterby selection
         values['domain'] = domain
+
+        # Sorting
+        sort_by_selection = [
+            ('date', 'Newest'),
+            ('name', 'Reference'),
+            ('amount', 'Amount'),
+        ]
+        if not sortby:
+            sortby = 'date'
+        order = 'create_date desc' if sortby == 'date' else 'name asc' if sortby == 'name' else 'amount_total desc'
+        values['order'] = order
+        values['sortby'] = sortby
+        values['sort_by_selection'] = sort_by_selection
 
         # Fetch counts for sales order status cards
         partner_id = partner.id

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="payment_status_cards" name="Payment Status Cards">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="/my/payments?filterby=draft" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-file-text-o fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Draft Invoices</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="draft_invoice_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="/my/payments?filterby=open" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-hourglass-half fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Open Invoices</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="open_invoice_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="/my/payments?filterby=paid" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-check-circle-o fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Paid Invoices</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="paid_invoice_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <a href="/my/payments?filterby=cancel" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-times-circle-o fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Cancelled Invoices</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="cancel_invoice_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_order_page_inherit" name="Portal My Order Page Inherit" inherit_id="sale.sale_order_portal_template" customize_show="True">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="before">
+            <div class="o_portal_return_sidebar mb-3">
+                <a href="/my/orders" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back to Orders</a>
+            </div>
+        </xpath>
+        <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' o_portal_sale_sidebar ')]" position="inside">
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Order Status Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Current Status:</strong> <span t-field="sale_order.current_status"/></p>
+                            <p><strong>Expected Delivery Date:</strong> <span t-field="sale_order.expected_delivery_date"/></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Financial Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Total Order Value:</strong> <span t-field="sale_order.amount_total"/></p>
+                            <p><strong>Payments Made:</strong> <span t-field="sale_order.payments_made"/></p>
+                            <p><strong>Balance Due:</strong> <span t-field="sale_order.balance_due"/></p>
+                            <p><strong>Payment Status:</strong> <span t-field="sale_order.payment_status"/></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

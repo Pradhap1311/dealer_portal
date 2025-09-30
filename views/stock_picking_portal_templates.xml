@@ -1,128 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Template for listing Delivery Orders -->
-    <template id="portal_my_stock_pickings" name="My Delivery Orders" customize_show="True">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
-            <div id="wrap" class="oe_structure o_portal_my_home">
-                <div class="container">
-                    <ol class="breadcrumb mb-3">
-                        <li class="breadcrumb-item"><a href="/my/home">Home</a></li>
+    <data>
+        <template id="portal_my_delivery_orders" name="My Delivery Orders">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div id="wrap" class="oe_structure">
+                    <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                        <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
                         <li class="breadcrumb-item active">Delivery Orders</li>
                     </ol>
+                    <div class="container">
+                        <t t-call="dealer_portal.delivery_status_cards"/>
 
-                                 <h1 class="mb-3">My Delivery Orders</h1>
-
-                    <t t-if="not stock_pickings">
-                        <p>There are no delivery orders to display.</p>
-                    </t>
-                    <t t-if="stock_pickings">
-                        <div class="table-responsive">
-                            <table class="table table-hover o_portal_my_stock_pickings_table">
-                                <thead>
-                                    <tr class="active">
-                                        <th>Reference</th>
-                                        <th>Scheduled Date</th>
-                                        <th>Status</th>
-                                        <th>Tracking Reference</th>
-                                        <th class="text-end"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="stock_pickings" t-as="picking">
+                        <div t-if="filterby" class="mt-4">
+                            <h3 class="mb-3" t-esc="current_filter_name"/>
+                            <div t-if="delivery_orders" class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead>
                                         <tr>
-                                            <td><a t-attf-href="/my/delivery/#{picking['id']}"><t t-esc="picking['name']"/></a></td>
-                                            <td><t t-esc="picking['scheduled_date']"/></td>
-                                            <td><t t-esc="picking['state']"/></td>
-                                            <td>N/A</td>
-                                            <td class="text-end">
-                                                <a t-attf-href="/my/delivery/#{picking['id']}" class="btn btn-primary btn-sm">View</a>
-                                            </td>
+                                            <th>Reference</th>
+                                            <th>Partner</th>
+                                            <th>Scheduled Date</th>
+                                            <th>Status</th>
+                                            <th></th>
                                         </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-                        </div>
-                    </t>
-                </div>
-            </div>
-        </t>
-    </template>
-
-    <!-- Template for Delivery Order Detail Page -->
-    <template id="portal_my_stock_picking_detail" name="Delivery Order Detail" customize_show="True">
-        <t t-call="portal.portal_layout">
-            <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
-            <div id="wrap" class="oe_structure">
-                <div class="container">
-
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Details</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong>Reference:</strong> <span t-esc="stock_picking['name']"/></p>
-                                    <p><strong>Scheduled Date:</strong> <span t-esc="stock_picking['scheduled_date']"/></p>
-                                    <p><strong>Status:</strong> <span t-esc="stock_picking['state']"/></p>
-                                    <p><strong>Delivery Lead Time:</strong> N/A</p>
-                                    <p><strong>Tracking Reference:</strong> N/A</p>
-                                    <p><strong>Origin:</strong> <span t-esc="stock_picking['origin']"/></p>
-                                </div>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="delivery_orders" t-as="do">
+                                            <tr>
+                                                <td><a t-attf-href="/my/delivery/#{do.id}"><t t-esc="do.name"/></a></td>
+                                                <td><t t-esc="do.partner_id.display_name"/></td>
+                                                <td><span t-field="do.scheduled_date"/></td>
+                                                <td><span t-field="do.state"/></td>
+                                                <td><a t-attf-href="/my/delivery/#{do.id}" class="btn btn-primary btn-sm">View</a></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
                             </div>
+                            <div t-else="" class="alert alert-info mt-3" role="alert">
+                                No delivery orders found for this status.
+                            </div>
+                            <div t-if="pager" class="o_portal_pager text-center">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                        <div t-else="" class="alert alert-info mt-3" role="alert">
+                            Select a status card above to view delivery orders.
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
 
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Operations</h5>
-                                </div>
-                                <div class="card-body">
-                                    <t t-if="not moves">
-                                        <p>No operations for this delivery order.</p>
-                                    </t>
-                                    <t t-if="moves">
-                                        <table class="table table-sm table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Product</th>
-                                                    <th>Quantity</th>
-                                                    <th>State</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <t t-foreach="moves" t-as="move">
-                                                    <tr>
-                                                        <td><t t-esc="move['product_id'][1]"/></td>
-                                                        <td><t t-esc="move['product_uom_qty']"/> <t t-esc="move['product_uom'][1]"/></td>
-                                                        <td><t t-esc="move['state']"/></td>
-                                                    </tr>
-                                                </t>
-                                            </tbody>
-                                        </table>
-                                    </t>
+        <template id="portal_my_delivery_order_page" name="My Delivery Order Page">
+            <t t-call="portal.portal_layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="o_portal_return_sidebar mb-3">
+                        <a href="/my/delivery" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back to Delivery Orders</a>
+                    </div>
+                    <div class="container">
+                        <div class="row mt-4">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Delivery Order Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Reference:</strong> <span t-field="delivery_order.name"/></p>
+                                        <p><strong>Partner:</strong> <span t-field="delivery_order.partner_id.display_name"/></p>
+                                        <p><strong>Scheduled Date:</strong> <span t-field="delivery_order.scheduled_date"/></p>
+                                        <p><strong>Status:</strong> <span t-field="delivery_order.state"/></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-lg-4">
-                            <!-- Sidebar content if needed -->
-                        </div>
                     </div>
-
-                    <div class="mt-4">
-                        <a href="/my/delivery" class="btn btn-secondary">Back to Delivery Orders</a>
-                    </div>
-
                 </div>
-            </div>
-        </t>
-    </template>
+            </t>
+        </template>
 
-    <template id="portal_my_stock_pickings_add_spinner" name="Portal My Delivery Orders Add Spinner" inherit_id="dealer_portal.portal_my_stock_pickings" priority="1">
-        <xpath expr="//div[@id='wrap']/div[@class='container']/h1" position="before">
-            <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>
-        </xpath>
-    </template>
+    </data>
 </odoo>

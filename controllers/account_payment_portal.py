@@ -21,11 +21,47 @@ class AccountPaymentPortal(CustomerPortal):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         AccountPayment = request.env['account.payment']
+        AccountMove = request.env['account.move']
 
         domain = [('partner_id', '=', partner.id)]
 
+        # Sorting and Filtering
+        sort_by_selection = [
+            ('date', 'Newest'),
+            ('amount', 'Amount'),
+        ]
+        filter_by_selection = [
+            ('all', 'All'),
+            ('draft', 'Draft'),
+            ('posted', 'Posted'), # Changed from 'open' to 'posted' for account.payment state
+            ('reconciled', 'Reconciled'), # Changed from 'paid' to 'reconciled' for account.payment state
+            ('cancel', 'Cancelled'),
+        ]
+
+        if not sortby:
+            sortby = 'date'
+        order = 'date desc' if sortby == 'date' else 'amount desc'
+
+        if not filterby:
+            filterby = 'all'
+
+        if filterby == 'draft':
+            domain += [('state', '=', 'draft')]
+        elif filterby == 'posted': # Changed from 'open' to 'posted'
+            domain += [('state', '=', 'posted')]
+        elif filterby == 'reconciled': # Changed from 'paid' to 'reconciled'
+            domain += [('state', '=', 'reconciled')]
+        elif filterby == 'cancel':
+            domain += [('state', '=', 'cancel')]
+
         if date_begin and date_end:
             domain += [('create_date', '>=', date_begin), ('create_date', '<=', date_end)]
+
+        # Invoice counts for status cards (these still refer to account.move, so payment_state is correct here)
+        draft_invoice_count = AccountMove.search_count([('partner_id', '=', partner.id), ('state', '=', 'draft')])
+        open_invoice_count = AccountMove.search_count([('partner_id', '=', partner.id), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))])
+        paid_invoice_count = AccountMove.search_count([('partner_id', '=', partner.id), ('state', '=', 'posted'), ('payment_state', '=', 'paid')])
+        cancel_invoice_count = AccountMove.search_count([('partner_id', '=', partner.id), ('state', '=', 'cancel')])
 
         # count for pager
         account_payment_count = AccountPayment.search_count(domain)
@@ -34,17 +70,27 @@ class AccountPaymentPortal(CustomerPortal):
             url="/my/payments",
             total=account_payment_count,
             page=page,
-            step=self._items_per_page
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search}
         )
 
         # content according to pager and domain
-        account_payments = AccountPayment.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        account_payments = AccountPayment.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'account_payments': account_payments,
             'page_name': 'account_payment',
             'pager': pager,
             'default_url': '/my/payments',
+            'sortby': sortby,
+            'sort_by_selection': sort_by_selection,
+            'filterby': filterby,
+            'filter_by_selection': filter_by_selection,
+            'search': search,
+            'draft_invoice_count': draft_invoice_count,
+            'open_invoice_count': open_invoice_count,
+            'paid_invoice_count': paid_invoice_count,
+            'cancel_invoice_count': cancel_invoice_count,
         })
         return request.render("dealer_portal.portal_my_payments", values)
 

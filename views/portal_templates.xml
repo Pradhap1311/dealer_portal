@@ -129,4 +129,6 @@
             <attribute name="style">display: none !important;</attribute>
         </xpath>
     </template>
+
+
 </odoo>

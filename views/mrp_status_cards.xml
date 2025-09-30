@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="mrp_status_cards" name="Manufacturing Order Status Cards">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/manufacturing?filterby=draft" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-file-text-o fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Draft MOs</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="draft_mo_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/manufacturing?filterby=confirmed" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-check-square-o fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Confirmed MOs</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="confirmed_mo_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/manufacturing?filterby=progress" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-cogs fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">In Progress MOs</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="progress_mo_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/manufacturing?filterby=done" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-thumbs-o-up fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Done MOs</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="done_mo_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/manufacturing?filterby=cancel" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-times-circle-o fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Cancelled MOs</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="cancel_mo_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>
