@@ -17,6 +17,22 @@ class DealerPortal(CustomerPortal):
             ('partner_id', '=', partner.id),
             ('state', 'in', ['draft', 'sent', 'sale'])
         ])
+        quote_count = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('state', '=', 'draft')
+        ])
+        quote_sent_count = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('state', '=', 'sent')
+        ])
+        confirmed_orders_count = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('state', '=', 'sale')
+        ])
+        cancelled_orders_count = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('state', '=', 'cancel')
+        ])
         in_production_count = request.env['mrp.production'].sudo().search_count([
             ('partner_id', '=', partner.id),
             ('state', 'not in', ['done', 'cancel'])
@@ -39,6 +55,10 @@ class DealerPortal(CustomerPortal):
 
         values.update({
             'total_orders_count': total_orders_count,
+            'quote_count': quote_count,
+            'quote_sent_count': quote_sent_count,
+            'confirmed_orders_count': confirmed_orders_count,
+            'cancelled_orders_count': cancelled_orders_count,
             'in_production_count': in_production_count,
             'delivery_count': delivery_count,
             'payments_count': payments_count,
@@ -52,19 +72,45 @@ class DealerPortal(CustomerPortal):
         partner = request.env.user.partner_id
 
         if filterby == 'quotation':
-            domain = self._prepare_quotations_domain(partner)
+            domain = [('partner_id', '=', partner.id), ('state', '=', 'draft')]
             values['current_filter_name'] = 'Quotations' # New variable for page title
+        elif filterby == 'sent':
+            domain = [('partner_id', '=', partner.id), ('state', '=', 'sent')]
+            values['current_filter_name'] = 'Quotations Sent'
         elif filterby == 'sale':
-            domain = self._prepare_orders_domain(partner)
+            domain = [('partner_id', '=', partner.id), ('state', '=', 'sale')]
             values['current_filter_name'] = 'Sales Orders' # New variable for page title
+        elif filterby == 'cancel':
+            domain = [('partner_id', '=', partner.id), ('state', '=', 'cancel')]
+            values['current_filter_name'] = 'Cancelled Orders'
         else: # 'all' or no filter
-            domain = [('message_partner_ids', 'child_of', [partner.commercial_partner_id.id])]
+            domain = [('partner_id', '=', partner.id)]
             values['current_filter_name'] = 'All Orders' # New variable for page title
 
         values['page_name'] = '' # Set page_name to empty for breadcrumbs
 
         # Update the domain in values to reflect the filterby selection
         values['domain'] = domain
+
+        # Fetch counts for sales order status cards
+        partner_id = partner.id
+        values['quote_count'] = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner_id),
+            ('state', '=', 'draft')
+        ])
+        values['quote_sent_count'] = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner_id),
+            ('state', '=', 'sent')
+        ])
+        values['confirmed_orders_count'] = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner_id),
+            ('state', '=', 'sale')
+        ])
+        values['cancelled_orders_count'] = request.env['sale.order'].sudo().search_count([
+            ('partner_id', '=', partner_id),
+            ('state', '=', 'cancel')
+        ])
+
         return values
 
     @http.route(['/my/dashboard'], type='http', auth="user", website=True)

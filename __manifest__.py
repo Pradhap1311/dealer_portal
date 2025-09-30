@@ -25,6 +25,7 @@
         'views/portal_templates.xml',
         'views/dealer_dashboard_templates.xml',
         'views/sale_order_portal_templates.xml',
+        'views/sale_order_status_cards.xml',
         'views/mrp_production_portal_templates.xml',
         'views/stock_picking_portal_templates.xml',
         'views/account_payment_portal_templates.xml',
