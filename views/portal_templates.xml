@@ -56,23 +56,48 @@
             <xpath expr="//div[hasclass('o_portal_my_home')]" position="replace">
                 <div class="o_portal_my_home">
                     <div class="container">
-                        <ul class="nav nav-tabs justify-content-center mb-3">
-                            <li class="nav-item">
-                                <a class="nav-link" t-att-class="'active' if page_name == 'dashboard' else ''" href="/my/dashboard">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" t-att-class="'active' if page_name == 'orders' else ''" href="/my/orders">Orders</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" t-att-class="'active' if page_name == 'mrp_production' else ''" href="/my/manufacturing">Manufacturing</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" t-att-class="'active' if page_name == 'stock_picking' else ''" href="/my/delivery">Delivery</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" t-att-class="'active' if page_name == 'account_payment' else ''" href="/my/payments">Payments</a>
-                            </li>
-                        </ul>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <a href="/my/orders" class="text-decoration-none">
+                                    <div class="card border-0 shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Total Orders</h5>
+                                            <p class="card-text fs-1" t-esc="total_orders_count"/>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <a href="/my/manufacturing" class="text-decoration-none">
+                                    <div class="card border-0 shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">MO's </h5>
+                                            <p class="card-text fs-1" t-esc="in_production_count"/>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <a href="/my/delivery" class="text-decoration-none">
+                                    <div class="card border-0 shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Deliveries</h5>
+                                            <p class="card-text fs-1" t-esc="delivery_count"/>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <a href="/my/payments" class="text-decoration-none">
+                                    <div class="card border-0 shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Payments</h5>
+                                            <p class="card-text fs-1" t-esc="payments_count"/>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>
                 </div>
@@ -94,4 +119,10 @@
         </template>
 
     </data>
+
+    <template id="portal_back_in_edit_mode_hide" inherit_id="portal.portal_back_in_edit_mode" customize_show="True" active="True" name="Hide Portal Back to Edit Mode">
+        <xpath expr="//div[hasclass('text-center')]" position="attributes">
+            <attribute name="style">display: none !important;</attribute>
+        </xpath>
+    </template>
 </odoo>

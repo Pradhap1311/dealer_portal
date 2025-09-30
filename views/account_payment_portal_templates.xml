@@ -5,13 +5,13 @@
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
 
-            <t t-call="portal.portal_back_in_edit_mode">
-                <t t-raw="0"/>
-            </t>
-
             <div id="wrap" class="oe_structure o_portal_my_home">
                 <div class="container">
-                    <h1 class="mb-3">My Payments</h1>
+                    <ol class="breadcrumb mb-3">
+                        <li class="breadcrumb-item"><a href="/my/home">Home</a></li>
+                        <li class="breadcrumb-item active">Payments</li>
+                    </ol>
+                                 <h1 class="mb-3">My Payments</h1>
 
                     <t t-if="not account_payments">
                         <p>There are no payments to display.</p>
@@ -53,14 +53,9 @@
     <template id="portal_my_payment_detail" name="Payment Detail" customize_show="True">
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
-            <t t-call="portal.portal_back_in_edit_mode">
-                <t t-raw="0"/>
-            </t>
-
             <div id="wrap" class="oe_structure">
                 <div class="container">
-                    <h1 class="mb-3">Payment: <span t-field="account_payment.name"/></h1>
+
 
                     <div class="row">
                         <div class="col-lg-8">
@@ -69,12 +64,12 @@
                                     <h5 class="mb-0">Details</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>Reference:</strong> <span t-field="account_payment.name"/></p>
-                                    <p><strong>Payment Date:</strong> <span t-field="account_payment.date"/></p>
-                                    <p><strong>Amount:</strong> <span t-field="account_payment.amount"/> <span t-field="account_payment.currency_id.symbol"/></p>
-                                    <p><strong>Status:</strong> <span t-field="account_payment.state"/></p>
-                                    <p><strong>Payment Method:</strong> <span t-field="account_payment.journal_id.name"/></p>
-                                    <p><strong>Memo:</strong> <span t-field="account_payment.ref"/></p>
+                                    <p><strong>Reference:</strong> <span t-esc="account_payment['name']"/></p>
+                                    <p><strong>Payment Date:</strong> <span t-esc="account_payment['date']"/></p>
+                                    <p><strong>Amount:</strong> <span t-esc="account_payment['amount']"/> <span t-esc="account_payment['currency_id'][1]"/></p>
+                                    <p><strong>Status:</strong> <span t-esc="account_payment['state']"/></p>
+                                    <p><strong>Payment Method:</strong> <span t-esc="account_payment['journal_id'][1]"/></p>
+
                                 </div>
                             </div>
                         </div>

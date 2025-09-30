@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="portal_my_orders_inherit" name="Portal My Orders Inherit" inherit_id="sale.portal_my_orders" customize_show="True">
+        <xpath expr="//t[@t-set='breadcrumbs_searchbar']" position="replace">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        </xpath>
+        <xpath expr="//t[@t-call='portal.portal_searchbar']" position="replace">
+            <t t-call="portal.portal_searchbar">
+                <t t-set="searchbar_filters" t-value="{
+                    'all': {'label': 'All Orders', 'domain': []},
+                    'quotation': {'label': 'Quotations', 'domain': [('state', 'in', ('draft', 'sent', 'cancel'))]},
+                    'sale': {'label': 'Sales Orders', 'domain': [('state', 'in', ('sale', 'done'))]},
+                }"/>
+            </t>
+        </xpath>
         <xpath expr="//thead/tr/th[last()]" position="after">
             <th class="text-start">Status</th>
             <th class="text-start">Expected Delivery</th>

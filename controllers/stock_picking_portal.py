@@ -38,14 +38,16 @@ class StockPickingPortal(CustomerPortal):
         )
 
         # content according to pager and domain
-        stock_pickings = StockPicking.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        stock_pickings_records = StockPicking.search(domain, limit=self._items_per_page, offset=pager['offset']).sudo()
 
         # If coming from a sale order, filter by it
         sale_order_id = kw.get('sale_order_id')
         if sale_order_id:
             sale_order = request.env['sale.order'].sudo().browse(int(sale_order_id))
             if sale_order.exists() and sale_order.partner_id == partner:
-                stock_pickings = stock_pickings.filtered(lambda p: p.sale_id == sale_order)
+                stock_pickings_records = stock_pickings_records.filtered(lambda p: p.sale_id == sale_order)
+        
+        stock_pickings = stock_pickings_records.read(['name', 'scheduled_date', 'state'])
 
         values.update({
             'stock_pickings': stock_pickings,
@@ -58,19 +60,23 @@ class StockPickingPortal(CustomerPortal):
     @http.route(['/my/delivery/<int:picking_id>'], type='http', auth="user", website=True)
     def portal_my_stock_picking_detail(self, picking_id, **kw):
         try:
-            stock_picking = request.env['stock.picking'].browse([picking_id])
+            stock_picking = request.env['stock.picking'].browse([picking_id]).sudo().read(['name', 'scheduled_date', 'state', 'origin', 'move_ids_without_package', 'partner_id'])[0]
         except (
             AccessError,
             MissingError
         ):
             return request.redirect('/my')
 
-        if not stock_picking or stock_picking.partner_id != request.env.user.partner_id:
+        if not stock_picking or stock_picking['partner_id'][0] != request.env.user.partner_id.id:
             return request.redirect('/my')
+
+        # Fetch the stock.move records and their product details
+        moves = request.env['stock.move'].sudo().browse(stock_picking['move_ids_without_package']).read(['product_id', 'product_uom_qty', 'product_uom', 'state'])
 
         values = self._prepare_portal_layout_values()
         values.update({
             'stock_picking': stock_picking,
+            'moves': moves, # Pass the fetched moves to the template
             'page_name': 'stock_picking_detail',
         })
         return request.render("dealer_portal.portal_my_stock_picking_detail", values)

@@ -5,13 +5,14 @@
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
 
-            <t t-call="portal.portal_back_in_edit_mode">
-                <t t-raw="0"/>
-            </t>
-
             <div id="wrap" class="oe_structure o_portal_my_home">
                 <div class="container">
-                    <h1 class="mb-3">My Delivery Orders</h1>
+                    <ol class="breadcrumb mb-3">
+                        <li class="breadcrumb-item"><a href="/my/home">Home</a></li>
+                        <li class="breadcrumb-item active">Delivery Orders</li>
+                    </ol>
+
+                                 <h1 class="mb-3">My Delivery Orders</h1>
 
                     <t t-if="not stock_pickings">
                         <p>There are no delivery orders to display.</p>
@@ -31,12 +32,12 @@
                                 <tbody>
                                     <t t-foreach="stock_pickings" t-as="picking">
                                         <tr>
-                                            <td><a t-attf-href="/my/delivery/#{picking.id}"><t t-esc="picking.name"/></a></td>
-                                            <td><t t-esc="picking.scheduled_date"/></td>
-                                            <td><t t-esc="picking.state"/></td>
-                                            <td><t t-esc="picking.carrier_tracking_ref or 'N/A'"/></td>
+                                            <td><a t-attf-href="/my/delivery/#{picking['id']}"><t t-esc="picking['name']"/></a></td>
+                                            <td><t t-esc="picking['scheduled_date']"/></td>
+                                            <td><t t-esc="picking['state']"/></td>
+                                            <td>N/A</td>
                                             <td class="text-end">
-                                                <a t-attf-href="/my/delivery/#{picking.id}" class="btn btn-primary btn-sm">View</a>
+                                                <a t-attf-href="/my/delivery/#{picking['id']}" class="btn btn-primary btn-sm">View</a>
                                             </td>
                                         </tr>
                                     </t>
@@ -54,13 +55,8 @@
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
 
-            <t t-call="portal.portal_back_in_edit_mode">
-                <t t-raw="0"/>
-            </t>
-
             <div id="wrap" class="oe_structure">
                 <div class="container">
-                    <h1 class="mb-3">Delivery Order: <span t-field="stock_picking.name"/></h1>
 
                     <div class="row">
                         <div class="col-lg-8">
@@ -69,12 +65,12 @@
                                     <h5 class="mb-0">Details</h5>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>Reference:</strong> <span t-field="stock_picking.name"/></p>
-                                    <p><strong>Scheduled Date:</strong> <span t-field="stock_picking.scheduled_date"/></p>
-                                    <p><strong>Status:</strong> <span t-field="stock_picking.state"/></p>
-                                    <p><strong>Delivery Lead Time:</strong> <span t-field="stock_picking.delivery_lead_time"/> days</p>
-                                    <p><strong>Tracking Reference:</strong> <span t-field="stock_picking.carrier_tracking_ref"/></p>
-                                    <p><strong>Origin:</strong> <span t-field="stock_picking.origin"/></p>
+                                    <p><strong>Reference:</strong> <span t-esc="stock_picking['name']"/></p>
+                                    <p><strong>Scheduled Date:</strong> <span t-esc="stock_picking['scheduled_date']"/></p>
+                                    <p><strong>Status:</strong> <span t-esc="stock_picking['state']"/></p>
+                                    <p><strong>Delivery Lead Time:</strong> N/A</p>
+                                    <p><strong>Tracking Reference:</strong> N/A</p>
+                                    <p><strong>Origin:</strong> <span t-esc="stock_picking['origin']"/></p>
                                 </div>
                             </div>
 
@@ -83,10 +79,10 @@
                                     <h5 class="mb-0">Operations</h5>
                                 </div>
                                 <div class="card-body">
-                                    <t t-if="not stock_picking.move_ids_without_package">
+                                    <t t-if="not moves">
                                         <p>No operations for this delivery order.</p>
                                     </t>
-                                    <t t-if="stock_picking.move_ids_without_package">
+                                    <t t-if="moves">
                                         <table class="table table-sm table-hover">
                                             <thead>
                                                 <tr>
@@ -96,11 +92,11 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <t t-foreach="stock_picking.move_ids_without_package" t-as="move">
+                                                <t t-foreach="moves" t-as="move">
                                                     <tr>
-                                                        <td><t t-esc="move.product_id.display_name"/></td>
-                                                        <td><t t-esc="move.product_uom_qty"/> <t t-esc="move.product_uom.name"/></td>
-                                                        <td><t t-esc="move.state"/></td>
+                                                        <td><t t-esc="move['product_id'][1]"/></td>
+                                                        <td><t t-esc="move['product_uom_qty']"/> <t t-esc="move['product_uom'][1]"/></td>
+                                                        <td><t t-esc="move['state']"/></td>
                                                     </tr>
                                                 </t>
                                             </tbody>

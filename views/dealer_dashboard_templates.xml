@@ -47,6 +47,23 @@
                             </div>
                         </div>
 
+                        <!-- Pending Deliveries -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Deliveries</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="pending_deliveries_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-hourglass-half fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Delivered Orders -->
                         <div class="col-lg-3 col-md-6 mb-4">
                             <div class="card border-info shadow h-100 py-2">
@@ -54,7 +71,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Delivered Orders</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="delivered_orders"/>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="delivered_orders_count"/>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fa fa-truck fa-2x text-gray-300"/>
@@ -64,17 +81,102 @@
                             </div>
                         </div>
 
-                        <!-- Outstanding Payments -->
+                        <!-- Cancelled Deliveries -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Cancelled Deliveries</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="cancelled_deliveries_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-times-circle fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Not Paid Invoices -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Not Paid Invoices</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="not_paid_invoices_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-credit-card fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Partially Paid Invoices -->
                         <div class="col-lg-3 col-md-6 mb-4">
                             <div class="card border-warning shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Outstanding Payments</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="outstanding_payments"/>
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Partially Paid Invoices</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="partial_paid_invoices_count"/>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fa fa-money fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paid Invoices -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Invoices</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="paid_invoices_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-check-circle fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- In Payment Invoices -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Payment Invoices</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="in_payment_invoices_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-hourglass-half fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reversed Invoices -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-secondary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Reversed Invoices</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="reversed_invoices_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-undo fa-2x text-gray-300"/>
                                         </div>
                                     </div>
                                 </div>

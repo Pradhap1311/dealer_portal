@@ -3,6 +3,7 @@
 from odoo import http
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
+from odoo.exceptions import AccessError, MissingError
 
 class AccountPaymentPortal(CustomerPortal):
 
@@ -50,14 +51,14 @@ class AccountPaymentPortal(CustomerPortal):
     @http.route(['/my/payments/<int:payment_id>'], type='http', auth="user", website=True)
     def portal_my_account_payment_detail(self, payment_id, **kw):
         try:
-            account_payment = request.env['account.payment'].browse([payment_id])
+            account_payment = request.env['account.payment'].browse([payment_id]).sudo().read(['name', 'partner_id', 'date', 'amount', 'currency_id', 'state', 'journal_id'])[0]
         except (
             AccessError,
             MissingError
         ):
             return request.redirect('/my')
 
-        if not account_payment or account_payment.partner_id != request.env.user.partner_id:
+        if not account_payment or account_payment['partner_id'][0] != request.env.user.partner_id.id:
             return request.redirect('/my')
 
         values = self._prepare_portal_layout_values()

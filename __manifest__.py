@@ -16,6 +16,8 @@
         'portal',
         'account',
         'stock',
+        'base',
+        'website',
     ],
     'data': [
         'security/dealer_portal_security.xml',
