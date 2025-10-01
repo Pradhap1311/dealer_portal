@@ -18,6 +18,8 @@
         'stock',
         'base',
         'website',
+        'sale_mrp',
+        'purchase',
     ],
     'data': [
         'security/dealer_portal_security.xml',
@@ -34,6 +36,9 @@
         'views/account_payment_portal_templates.xml',
         'views/portal_payments_templates.xml',
         'views/sale_order_portal_page_templates.xml',
+        'views/mrp_workorder_views.xml',
+        'views/purchase_portal_templates.xml',
+        'views/vendor_bill_portal_templates.xml',
     ],
     'installable': True,
     'application': True,

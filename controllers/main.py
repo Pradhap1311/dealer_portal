@@ -71,6 +71,27 @@ class DealerPortal(CustomerPortal):
 
         payments_count = open_invoice_count + paid_invoice_count
 
+        # Determine if the current user is an administrator
+        is_admin = request.env.user.has_group('base.group_system')
+
+        # Purchase Order Counts
+        purchase_domain = []
+        if not is_admin:
+            purchase_domain = [('message_partner_ids', 'child_of', [request.env.user.partner_id.commercial_partner_id.id])]
+        purchase_rfq_count = request.env['purchase.order'].sudo().search_count(purchase_domain + [('state', '=', 'draft')])
+        purchase_quotes_sent_count = request.env['purchase.order'].sudo().search_count(purchase_domain + [('state', '=', 'sent')])
+        purchase_confirmed_orders_count = request.env['purchase.order'].sudo().search_count(purchase_domain + [('state', '=', 'purchase')])
+        purchase_cancelled_orders_count = request.env['purchase.order'].sudo().search_count(purchase_domain + [('state', '=', 'cancel')])
+
+        # Vendor Bill Counts
+        vendor_bill_domain = [('move_type', '=', 'in_invoice')]
+        if not is_admin:
+            vendor_bill_domain = [('partner_id', 'child_of', [request.env.user.partner_id.commercial_partner_id.id]), ('move_type', '=', 'in_invoice')]
+        vendor_bill_draft_count = request.env['account.move'].sudo().search_count(vendor_bill_domain + [('state', '=', 'draft')])
+        vendor_bill_posted_count = request.env['account.move'].sudo().search_count(vendor_bill_domain + [('state', '=', 'posted')])
+        vendor_bill_paid_count = request.env['account.move'].sudo().search_count(vendor_bill_domain + [('payment_state', '=', 'paid')])
+        vendor_bill_cancelled_count = request.env['account.move'].sudo().search_count(vendor_bill_domain + [('state', '=', 'cancel')])
+
         values.update({
             'total_orders_count': total_orders_count,
             'quote_count': quote_count,
@@ -94,6 +115,14 @@ class DealerPortal(CustomerPortal):
             'open_invoice_count': open_invoice_count,
             'paid_invoice_count': paid_invoice_count,
             'cancel_invoice_count': cancel_invoice_count,
+            'purchase_rfq_count': purchase_rfq_count,
+            'purchase_quotes_sent_count': purchase_quotes_sent_count,
+            'purchase_confirmed_orders_count': purchase_confirmed_orders_count,
+            'purchase_cancelled_orders_count': purchase_cancelled_orders_count,
+            'vendor_bill_draft_count': vendor_bill_draft_count,
+            'vendor_bill_posted_count': vendor_bill_posted_count,
+            'vendor_bill_paid_count': vendor_bill_paid_count,
+            'vendor_bill_cancelled_count': vendor_bill_cancelled_count,
         })
         return values
 

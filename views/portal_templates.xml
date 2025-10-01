@@ -101,6 +101,52 @@
                                     </div>
                                 </a>
                             </div>
+                            <t t-if="user_id and user_id.has_group('base.group_system')">
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    <a href="/my/purchase" class="text-decoration-none">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                                <i class="fa fa-shopping-basket fa-3x text-danger mb-3"></i>
+                                                <h5 class="card-title text-uppercase text-muted mb-0">Purchase</h5>
+                                                <p class="card-text fs-2 fw-bold text-dark" t-esc="purchase_rfq_count + purchase_quotes_sent_count + purchase_confirmed_orders_count"/>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    <a href="/my/vendor_bills" class="text-decoration-none">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                                <i class="fa fa-file-text-o fa-3x text-secondary mb-3"></i>
+                                                <h5 class="card-title text-uppercase text-muted mb-0">Vendor Bills</h5>
+                                                <p class="card-text fs-2 fw-bold text-dark" t-esc="vendor_bill_draft_count + vendor_bill_posted_count"/>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    <a href="/my/opportunities" class="text-decoration-none">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                                <i class="fa fa-lightbulb-o fa-3x text-warning mb-3"></i>
+                                                <h5 class="card-title text-uppercase text-muted mb-0">Opportunities</h5>
+                                                <p class="card-text fs-2 fw-bold text-dark"></p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    <a href="/my/documents" class="text-decoration-none">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                                <i class="fa fa-folder-open-o fa-3x text-info mb-3"></i>
+                                                <h5 class="card-title text-uppercase text-muted mb-0">Documents</h5>
+                                                <p class="card-text fs-2 fw-bold text-dark"></p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </t>
                         </div>
                     </div>
                     <div class="o_portal_doc_spinner spinner-border text-o-color-2 align-self-center mt-5"/>

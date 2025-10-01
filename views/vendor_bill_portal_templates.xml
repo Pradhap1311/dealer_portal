@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="portal_my_vendor_bills" name="My Vendor Bills">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div id="wrap" class="oe_structure">
+                    <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                        <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                        <li class="breadcrumb-item active">Vendor Bills</li>
+                    </ol>
+                    <div class="container">
+                        <h1 class="mb-3">My Vendor Bills</h1>
+                        <div class="row content-group">
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card border-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Draft Bills</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_draft_count"/>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-file-text-o fa-2x text-gray-300"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card border-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Posted Bills</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_posted_count"/>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-paper-plane-o fa-2x text-gray-300"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card border-success shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Bills</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_paid_count"/>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-check-circle-o fa-2x text-gray-300"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card border-danger shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Cancelled Bills</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_cancelled_count"/>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-times-circle-o fa-2x text-gray-300"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="vendor_bills" class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="panel-title">Vendor Bills</h3>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <div class="o_portal_searchbar">
+                                            <form class="o_portal_searchbar_form d-flex" method="get" action="/my/vendor_bills">
+                                                <div class="input-group me-2">
+                                                    <input type="text" class="form-control" name="search" t-att-value="search" placeholder="Search..."/>
+                                                    <select class="form-control flex-grow-0 w-auto" name="search_in" t-att-value="search_in">
+                                                        <option value="content">Reference</option>
+                                                        <option value="partner">Vendor</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                                </div>
+                                                <div class="dropdown me-2">
+                                                    <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                                        <span class="fa fa-filter"/>
+                                                        <span class="d-none d-md-inline">Filter:</span>
+                                                        <t t-esc="searchbar_filters[filterby]['label']"/>
+                                                    </a>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <t t-foreach="searchbar_filters" t-as="filter_id">
+                                                            <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/vendor_bills') + keep_query(search=search, search_in=search_in, sortby=sortby, filterby=filter_id)">
+                                                                <t t-esc="searchbar_filters[filter_id]['label']"/>
+                                                            </a>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                                        <span class="fa fa-sort-amount-asc"/>
+                                                        <span class="d-none d-md-inline">Sort by:</span>
+                                                        <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                                    </a>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <t t-foreach="searchbar_sortings" t-as="sort_id">
+                                                            <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/vendor_bills') + keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id)">
+                                                                <t t-esc="searchbar_sortings[sort_id]['label']"/>
+                                                            </a>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Reference</th>
+                                            <th>Vendor</th>
+                                            <th>Bill Date</th>
+                                            <th>Due Date</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="vendor_bills" t-as="bill">
+                                            <tr>
+                                                <td><a t-attf-href="/my/vendor_bills/#{bill.id}"><t t-esc="bill.name"/></a></td>
+                                                <td><t t-esc="bill.partner_id.name"/></td>
+                                                <td><t t-esc="bill.invoice_date"/></td>
+                                                <td><t t-esc="bill.invoice_date_due"/></td>
+                                                <td><t t-esc="bill.amount_total" t-options='{"widget": "monetary", "display_currency": bill.currency_id}'/></td>
+                                                <td><span t-field="bill.state"/></td>
+                                                <td><a t-attf-href="/my/vendor_bills/#{bill.id}" class="btn btn-primary btn-sm">View</a></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div t-if="pager" class="o_portal_pager text-center">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                        <t t-else="">
+                            <div class="alert alert-info mt-3" role="alert">
+                                No vendor bills found.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>
