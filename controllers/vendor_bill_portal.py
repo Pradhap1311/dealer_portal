@@ -36,13 +36,15 @@ class VendorBillPortal(CustomerPortal):
         partner = request.env.user.partner_id
         AccountMove = request.env['account.move'].sudo()
 
-        domain = [
+        base_domain = [
             ('move_type', '=', 'in_invoice'),
         ]
         
         # If not admin, restrict to partner's vendor bills
         if not request.env.user.has_group('base.group_system'):
-            domain += [('partner_id', 'child_of', [partner.commercial_partner_id.id])]
+            base_domain += [('partner_id', 'child_of', [partner.commercial_partner_id.id])]
+
+        domain = list(base_domain) # Start with a copy of base_domain
 
         # Apply filterby
         searchbar_filters = self._get_vendor_bill_searchbar_filters()
@@ -60,15 +62,15 @@ class VendorBillPortal(CustomerPortal):
 
         # Apply sorting
         searchbar_sortings = self._get_vendor_bill_searchbar_sortings()
-        if not sortby:
+        if sortby not in searchbar_sortings:
             sortby = 'date'
         order = searchbar_sortings[sortby]['order']
 
-        # Counts for different states
-        vendor_bill_draft_count = AccountMove.search_count(domain + [('state', '=', 'draft')])
-        vendor_bill_posted_count = AccountMove.search_count(domain + [('state', '=', 'posted')])
-        vendor_bill_paid_count = AccountMove.search_count(domain + [('payment_state', '=', 'paid')])
-        vendor_bill_cancelled_count = AccountMove.search_count(domain + [('state', '=', 'cancel')])
+        # Counts for different states (using base_domain)
+        vendor_bill_draft_count = AccountMove.search_count(base_domain + [('state', '=', 'draft')])
+        vendor_bill_posted_count = AccountMove.search_count(base_domain + [('state', '=', 'posted')])
+        vendor_bill_paid_count = AccountMove.search_count(base_domain + [('payment_state', '=', 'paid')])
+        vendor_bill_cancelled_count = AccountMove.search_count(base_domain + [('state', '=', 'cancel')])
 
         # Fetch vendor bills for display
         vendor_bills_count = AccountMove.search_count(domain)
