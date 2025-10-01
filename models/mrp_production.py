@@ -2,9 +2,18 @@
 
 from odoo import fields, models, api
 from datetime import timedelta
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super(MrpProduction, self).create(vals_list)
+
+        return res
 
     partner_id = fields.Many2one(
         'res.partner', string='Customer',
@@ -25,6 +34,7 @@ class MrpProduction(models.Model):
         help="Expected delivery date for the manufacturing order, considering delivery lead time."
     )
 
+    @api.depends('origin', 'picking_ids.partner_id')
     def _compute_partner_id(self):
         for production in self:
             partner = False
@@ -48,8 +58,10 @@ class MrpProduction(models.Model):
             if total_workorders:
                 done_workorders = len(production.workorder_ids.filtered(lambda wo: wo.state == 'done'))
                 production.workorder_completion_percentage = (done_workorders / total_workorders) * 100
+                _logger.info("MRP Production %s: Work Order Completion %% computed as %.2f%% (%s done out of %s)", production.name, production.workorder_completion_percentage, done_workorders, total_workorders)
             else:
                 production.workorder_completion_percentage = 0.0
+                _logger.info("MRP Production %s: Work Order Completion %% set to 0.0%% (no work orders)", production.name)
 
     @api.depends('date_deadline', 'create_date') # Updated dependency
     def _compute_expected_delivery_date(self):

@@ -33,25 +33,43 @@ class DealerPortal(CustomerPortal):
             ('partner_id', '=', partner.id),
             ('state', '=', 'cancel')
         ])
-        in_production_count = request.env['mrp.production'].sudo().search_count([
-            ('partner_id', '=', partner.id),
-            ('state', 'not in', ['done', 'cancel'])
-        ])
+        orders_in_production = request.env['mrp.production'].sudo().search_count(
+            [('partner_id', '=', partner.id)]
+        )
+
+        draft_mo_count = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'draft')])
+        confirmed_mo_count = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'confirmed')])
+        progress_mo_count = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'progress')])
+        done_mo_count = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'done')])
+        cancel_mo_count = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'cancel')])
+
         delivery_count = request.env['stock.picking'].sudo().search_count([
             ('partner_id', '=', partner.id),
             ('picking_type_code', '=', 'outgoing'),
-            ('state', '=', 'done')
         ])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - Calculated delivery_count: %s", delivery_count)
 
-        all_invoices_for_home = request.env['account.move'].sudo().search([
-            ('partner_id', '=', partner.id),
-            ('move_type', '=', 'out_invoice'),
-        ])
-        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - All Outgoing Invoices for Partner %s: %s", partner.id, all_invoices_for_home.mapped('payment_state'))
+        draft_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'draft')])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - draft_delivery_count: %s", draft_delivery_count)
+        waiting_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'waiting')])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - waiting_delivery_count: %s", waiting_delivery_count)
+        ready_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'assigned')])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - ready_delivery_count: %s", ready_delivery_count)
+        done_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'done')])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - done_delivery_count: %s", done_delivery_count)
+        cancel_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
+        _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - cancel_delivery_count: %s", cancel_delivery_count)
 
-        payments_count = all_invoices_for_home.search_count([
-            ('payment_state', 'in', ['not_paid', 'partial'])
-        ])
+        draft_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
+        open_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
+        paid_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
+        cancel_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
+
+        payments_count = open_invoice_count + paid_invoice_count
+
+
+
+        payments_count = open_invoice_count + paid_invoice_count
 
         values.update({
             'total_orders_count': total_orders_count,
@@ -59,9 +77,23 @@ class DealerPortal(CustomerPortal):
             'quote_sent_count': quote_sent_count,
             'confirmed_orders_count': confirmed_orders_count,
             'cancelled_orders_count': cancelled_orders_count,
-            'in_production_count': in_production_count,
+            'in_production_count': orders_in_production,
+            'draft_mo_count': draft_mo_count,
+            'confirmed_mo_count': confirmed_mo_count,
+            'progress_mo_count': progress_mo_count,
+            'done_mo_count': done_mo_count,
+            'cancel_mo_count': cancel_mo_count,
             'delivery_count': delivery_count,
+            'draft_delivery_count': draft_delivery_count,
+            'waiting_delivery_count': waiting_delivery_count,
+            'ready_delivery_count': ready_delivery_count,
+            'done_delivery_count': done_delivery_count,
+            'cancel_delivery_count': cancel_delivery_count,
             'payments_count': payments_count,
+            'draft_invoice_count': draft_invoice_count,
+            'open_invoice_count': open_invoice_count,
+            'paid_invoice_count': paid_invoice_count,
+            'cancel_invoice_count': cancel_invoice_count,
         })
         return values
 
@@ -130,8 +162,10 @@ class DealerPortal(CustomerPortal):
     def portal_my_delivery_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
+        _logger.info("Portal My Delivery Orders - Partner ID: %s", partner.id)
 
         domain = [('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing')]
+        _logger.info("Portal My Delivery Orders - Initial Domain: %s", domain)
 
         if filterby == 'draft':
             domain += [('state', '=', 'draft')]
@@ -191,8 +225,10 @@ class DealerPortal(CustomerPortal):
     def portal_my_payments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
+        _logger.info("Portal My Payments - Partner ID: %s", partner.id)
 
         domain = [('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice')]
+        _logger.info("Portal My Payments - Initial Domain: %s", domain)
 
         if filterby == 'draft':
             domain += [('state', '=', 'draft')]
@@ -284,7 +320,8 @@ class DealerPortal(CustomerPortal):
         )
 
         # Content according to pager and domain
-        orders = SaleOrder.search(domain, order=values.get('order'), limit=self._items_per_page, offset=pager['offset'])
+        orders = SaleOrder.sudo().search(domain, order=values.get('order'), limit=self._items_per_page, offset=pager['offset'])
+        _logger.info("Portal My Orders - Fetched orders count for filterby %s: %s", filterby, len(orders))
 
         values.update({
             'orders': orders,
@@ -383,8 +420,7 @@ class DealerPortal(CustomerPortal):
         )
 
         orders_in_production = request.env['mrp.production'].sudo().search_count(
-            [('partner_id', '=', partner.id),
-            ('state', 'not in', ['done', 'cancel'])]
+            [('partner_id', '=', partner.id)]
         )
 
         all_outgoing_pickings = request.env['stock.picking'].sudo().search([
@@ -410,6 +446,7 @@ class DealerPortal(CustomerPortal):
         reversed_invoices_count = all_invoices.search_count([('payment_state', '=', 'reversed')])
 
         values = self._prepare_portal_layout_values()
+
         values.update({
             'total_orders': total_orders,
             'orders_in_production': orders_in_production,

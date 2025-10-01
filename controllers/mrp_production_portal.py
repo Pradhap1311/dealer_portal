@@ -9,7 +9,7 @@ class MrpProductionPortal(CustomerPortal):
     def _prepare_portal_layout_values(self):
         values = super(MrpProductionPortal, self)._prepare_portal_layout_values()
         partner = request.env.user.partner_id
-        mrp_production_count = request.env['mrp.production'].search_count([
+        mrp_production_count = request.env['mrp.production'].sudo().search_count([
             ('partner_id', '=', partner.id)
         ])
         values['mrp_production_count'] = mrp_production_count
@@ -22,10 +22,36 @@ class MrpProductionPortal(CustomerPortal):
         MrpProduction = request.env['mrp.production']
 
         domain = [('partner_id', '=', partner.id)]
+
+        # Map filterby parameter to actual MRP production states
+        state_map = {
+            'draft': 'draft',
+            'confirmed': 'confirmed',
+            'progress': 'progress',
+            'to_close': 'to_close',
+            'done': 'done',
+            'cancel': 'cancel',
+        }
+
+        _logger.info("Portal: filterby parameter: %s", filterby)
+        _logger.info("Portal: Initial domain: %s", domain)
+
+        if filterby in state_map:
+            domain += [('state', '=', state_map[filterby])]
+        
+        _logger.info("Portal: Final domain after filterby: %s", domain)
+
         if date_begin and date_end:
             domain += [('create_date', '>=', date_begin), ('create_date', '<=', date_end)]
 
+        # Calculate counts for each state
+        mrp_production_counts = {}
+        for state_key, state_val in state_map.items():
+            mrp_production_counts[state_key + '_mo_count'] = MrpProduction.search_count([('partner_id', '=', partner.id), ('state', '=', state_val)])
+        
+        # Total count for pager
         mrp_production_count = MrpProduction.search_count(domain)
+        
         pager = portal_pager(
             url="/my/manufacturing",
             total=mrp_production_count,
@@ -34,6 +60,7 @@ class MrpProductionPortal(CustomerPortal):
         )
 
         mrp_productions = MrpProduction.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        _logger.info("Portal: Mrp Productions found: %s", mrp_productions)
 
         # Filter by sale order if provided
         sale_order_id = kw.get('sale_order_id')
@@ -49,6 +76,8 @@ class MrpProductionPortal(CustomerPortal):
             'page_name': 'mrp_production',
             'pager': pager,
             'default_url': '/my/manufacturing',
+            'filterby': filterby, # Pass filterby to the template
+            **mrp_production_counts, # Pass all counts to the template
         })
         return request.render("dealer_portal.portal_my_mrp_productions", values)
 

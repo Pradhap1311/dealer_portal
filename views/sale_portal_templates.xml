@@ -5,14 +5,10 @@
         <xpath expr="//thead/tr/th[last()]" position="after">
             <th class="text-start">Status</th>
             <th class="text-start">Expected Delivery</th>
-            <th class="text-start">Manufacturing Orders</th>
-            <th class="text-start">Delivery Orders</th>
         </xpath>
 
         <!-- This adds the corresponding cells to the end of the table body row -->
         <xpath expr="//tbody/tr/td[last()]" position="after">
-            <td>-</td>
-            <td>-</td>
             <td>-</td>
             <td>-</td>
         </xpath>
