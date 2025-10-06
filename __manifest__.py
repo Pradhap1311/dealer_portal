@@ -33,7 +33,6 @@
         'views/delivery_status_cards.xml',
         'views/stock_picking_portal_templates.xml',
         'views/payment_status_cards.xml',
-        'views/account_payment_portal_templates.xml',
         'views/portal_payments_templates.xml',
         'views/sale_order_portal_page_templates.xml',
         'views/mrp_workorder_views.xml',
