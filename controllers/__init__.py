@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import main
+from . import stock_picking_portal
 from . import mrp_production_portal
 from . import stock_picking_portal
 from . import purchase_portal

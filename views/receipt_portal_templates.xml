@@ -90,29 +90,36 @@
                                         <h5 class="mb-0">Receipt Details</h5>
                                     </div>
                                     <div class="card-body">
-                                        <p><strong>Reference:</strong> <span t-field="receipt_order.name"/></p>
-                                        <p><strong>Partner:</strong> <span t-field="receipt_order.partner_id.display_name"/></p>
-                                        <p><strong>Scheduled Date:</strong> <span t-field="receipt_order.scheduled_date"/></p>
-                                        <p><strong>Status:</strong> <span t-field="receipt_order.state"/></p>
-                                        <h6 class="mt-4">Products:</h6>
-                                        <t t-if="receipt_order.move_ids_without_package">
-                                            <ul class="list-group mb-3">
-                                                <t t-foreach="receipt_order.move_ids_without_package" t-as="move">
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <strong>Product:</strong> <t t-esc="move.product_id.display_name"/>
-                                                        </div>
-                                                        <div>
-                                                            <strong>Quantity:</strong> <t t-esc="move.product_uom_qty"/> <t t-esc="move.product_uom.name"/>
-                                                        </div>
-                                                        <span class="badge bg-primary rounded-pill"><t t-esc="move.state"/></span>
-                                                    </li>
-                                                </t>
-                                            </ul>
-                                        </t>
-                                        <t t-else="">
-                                            <p>No products in this receipt.</p>
-                                        </t>
+                                        <form t-attf-action="/my/receipts/#{receipt_order.id}/update" method="POST">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <p><strong>Reference:</strong> <span t-field="receipt_order.name"/></p>
+                                            <p><strong>Partner:</strong> <span t-field="receipt_order.partner_id.display_name"/></p>
+                                            <div class="form-group">
+                                                <label for="scheduled_date">Scheduled Date:</label>
+                                                <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" t-att-value="receipt_order.scheduled_date"/>
+                                            </div>
+                                            <p><strong>Status:</strong> <span t-field="receipt_order.state"/></p>
+                                            <h6 class="mt-4">Products:</h6>
+                                            <t t-if="receipt_order.move_ids_without_package">
+                                                <ul class="list-group mb-3">
+                                                    <t t-foreach="receipt_order.move_ids_without_package" t-as="move">
+                                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <strong>Product:</strong> <t t-esc="move.product_id.display_name"/>
+                                                            </div>
+                                                            <div>
+                                                                <strong>Quantity:</strong> <t t-esc="move.product_uom_qty"/> <t t-esc="move.product_uom.name"/>
+                                                            </div>
+                                                            <span class="badge bg-primary rounded-pill"><t t-esc="move.state"/></span>
+                                                        </li>
+                                                    </t>
+                                                </ul>
+                                            </t>
+                                            <t t-else="">
+                                                <p>No products in this receipt.</p>
+                                            </t>
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
