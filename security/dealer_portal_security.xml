@@ -10,10 +10,8 @@
 
         <!-- Record rules for dealer portal users -->
         <record id="sale_order_dealer_portal_rule" model="ir.rule">
-            <field name="name">Sale Order Dealer Portal User</field>
             <field name="model_id" ref="sale.model_sale_order"/>
-            <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -21,10 +19,8 @@
         </record>
 
         <record id="mrp_production_dealer_portal_rule" model="ir.rule">
-            <field name="name">Manufacturing Order Dealer Portal User</field>
             <field name="model_id" ref="mrp.model_mrp_production"/>
-            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -34,8 +30,7 @@
         <record id="stock_picking_dealer_portal_rule" model="ir.rule">
             <field name="name">Delivery Order Dealer Portal User</field>
             <field name="model_id" ref="stock.model_stock_picking"/>
-            <field name="domain_force">['|', ('partner_id', '=', user.partner_id.id), ('message_partner_ids', 'child_of', [user.partner_id.id])]</field>
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -46,18 +41,31 @@
             <field name="name">Payment Dealer Portal User</field>
             <field name="model_id" ref="account.model_account_payment"/>
             <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_portal'))]"/>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_portal')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <record id="account_move_dealer_portal_rule" model="ir.rule">
-            <field name="name">Invoice Dealer Portal User</field>
-            <field name="model_id" ref="account.model_account_move"/>
-            <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_portal'))]"/>
+
+
+        <record id="crm_lead_dealer_portal_rule" model="ir.rule">
+            <field name="name">Opportunity Dealer Portal User</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">[('partner_id', 'child_of', [user.partner_id.commercial_partner_id.id])]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <record id="ir_attachment_dealer_portal_rule" model="ir.rule">
+            <field name="name">Attachment Dealer Portal User</field>
+            <field name="model_id" ref="base.model_ir_attachment"/>
+            <field name="domain_force">['|', '&amp;', ('res_model', '=', 'res.partner'), ('res_id', '=', user.partner_id.id), '&amp;', ('res_model', 'in', ['sale.order', 'purchase.order', 'account.move', 'crm.lead', 'mrp.production', 'stock.picking']), ('res_id', 'in', user.partner_id.commercial_partner_id.child_ids.ids + [user.partner_id.commercial_partner_id.id]) ]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
@@ -68,7 +76,7 @@
             <field name="name">Procurement Group Dealer Portal User</field>
             <field name="model_id" ref="stock.model_procurement_group"/>
             <field name="domain_force">[(1, '=', 1)]</field> <!-- Allow access to all procurement groups -->
-            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user'))]"/>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>

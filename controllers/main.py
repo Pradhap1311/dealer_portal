@@ -11,6 +11,8 @@ class DealerPortal(CustomerPortal):
         partner = request.env.user.partner_id
 
         _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - Partner ID: %s", partner.id)
+        _logger.info("DEBUG: partner.id in _prepare_home_portal_values: %s", partner.id)
+        _logger.info("DEBUG: partner.commercial_partner_id.id in _prepare_home_portal_values: %s", partner.commercial_partner_id.id)
 
         # Fetch counts for summary cards
         total_orders_count = request.env['sale.order'].sudo().search_count([
@@ -60,16 +62,18 @@ class DealerPortal(CustomerPortal):
         cancel_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
         _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - cancel_delivery_count: %s", cancel_delivery_count)
 
-        draft_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
-        open_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
-        paid_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
-        cancel_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
+        draft_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
+        open_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
+        paid_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
+        cancel_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
 
-        payments_count = open_invoice_count + paid_invoice_count
+        payments_count = draft_invoice_count + open_invoice_count + paid_invoice_count + cancel_invoice_count
 
+        _logger.info("DEBUG: draft_invoice_count in _prepare_home_portal_values: %s", draft_invoice_count)
+        _logger.info("DEBUG: payments_count in _prepare_home_portal_values: %s", payments_count)
 
-
-        payments_count = open_invoice_count + paid_invoice_count
+        _logger.info("DEBUG: draft_invoice_count in _prepare_home_portal_values: %s", draft_invoice_count)
+        _logger.info("DEBUG: payments_count in _prepare_home_portal_values: %s", payments_count)
 
         # Determine if the current user is an administrator
         is_admin = request.env.user.has_group('base.group_system')
@@ -462,7 +466,7 @@ class DealerPortal(CustomerPortal):
         delivered_orders_count = all_outgoing_pickings.search_count([('state', '=', 'done')])
         cancelled_deliveries_count = all_outgoing_pickings.search_count([('state', '=', 'cancel')])
 
-        all_invoices = request.env['account.move'].sudo().search([
+        all_invoices = request.env['account.move'].search([
             ('partner_id', '=', partner.id),
             ('move_type', '=', 'out_invoice'),
         ])
@@ -473,6 +477,15 @@ class DealerPortal(CustomerPortal):
         paid_invoices_count = all_invoices.search_count([('payment_state', '=', 'paid')])
         in_payment_invoices_count = all_invoices.search_count([('payment_state', '=', 'in_payment')])
         reversed_invoices_count = all_invoices.search_count([('payment_state', '=', 'reversed')])
+
+        draft_invoices_count = request.env['account.move'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('move_type', '=', 'out_invoice'),
+            ('state', '=', 'draft')
+        ])
+
+        total_payments_count = not_paid_invoices_count + partial_paid_invoices_count + paid_invoices_count + \
+                               in_payment_invoices_count + reversed_invoices_count + draft_invoices_count
 
         values = self._prepare_portal_layout_values()
 
@@ -487,6 +500,7 @@ class DealerPortal(CustomerPortal):
             'paid_invoices_count': paid_invoices_count,
             'in_payment_invoices_count': in_payment_invoices_count,
             'reversed_invoices_count': reversed_invoices_count,
+            'total_payments_count': total_payments_count, # Add this new count
             'page_name': 'dashboard',
         })
         return request.render("dealer_portal.dealer_dashboard", values)

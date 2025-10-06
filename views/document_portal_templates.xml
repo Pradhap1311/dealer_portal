@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="portal_my_documents" name="My Documents">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div id="wrap" class="oe_structure">
+                    <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                        <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                        <li class="breadcrumb-item active">Documents</li>
+                    </ol>
+                    <div class="container">
+                        <h1 class="mb-3">My Documents</h1>
+
+                        <div class="row content-group mb-3">
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='all', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='all', search=search, search_in=search_in, sortby=sortby) else '?category=all')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'all' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">All</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='sales', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='sales', search=search, search_in=search_in, sortby=sortby) else '?category=sales')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'sales' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">Sales</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='purchase', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='purchase', search=search, search_in=search_in, sortby=sortby) else '?category=purchase')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'purchase' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">Purchase</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='mo', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='mo', search=search, search_in=search_in, sortby=sortby) else '?category=mo')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'mo' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">MO</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='payments', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='payments', search=search, search_in=search_in, sortby=sortby) else '?category=payments')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'payments' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">Payments</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='vendor_bills', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='vendor_bills', search=search, search_in=search_in, sortby=sortby) else '?category=vendor_bills')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'vendor_bills' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">Vendor Bills</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='crm', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='crm', search=search, search_in=search_in, sortby=sortby) else '?category=crm')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'crm' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">CRM</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                                <a t-att-href="url_for('/my/documents') + (('?' + keep_query(category='deliveries', search=search, search_in=search_in, sortby=sortby)) if keep_query(category='deliveries', search=search, search_in=search_in, sortby=sortby) else '?category=deliveries')" class="text-decoration-none">
+                                    <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if category == 'deliveries' else ''}">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title text-uppercase text-muted mb-0">Deliveries</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div t-if="documents" class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="panel-title">Documents</h3>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <div class="o_portal_searchbar">
+                                            <form class="o_portal_searchbar_form d-flex" method="get" t-att-action="url_for('/my/documents') + (('?' + keep_query(category=category)) if category != 'all' else '')">
+                                                <div class="input-group me-2">
+                                                    <input type="text" class="form-control" name="search" t-att-value="search" placeholder="Search..."/>
+                                                    <select class="form-control flex-grow-0 w-auto" name="search_in" t-att-value="search_in">
+                                                        <option value="content">Name/Description</option>
+                                                        <option value="type">Type</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                                        <span class="fa fa-sort-amount-asc"/>
+                                                        <span class="d-none d-md-inline">Sort by:</span>
+                                                        <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                                    </a>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <t t-foreach="searchbar_sortings" t-as="sort_id">
+                                                            <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/documents') + (('?' + keep_query(search=search, search_in=search_in, sortby=sort_id, category=category)) if keep_query(search=search, search_in=search_in, sortby=sort_id, category=category) else '')">
+                                                                <t t-esc="searchbar_sortings[sort_id]['label']"/>
+                                                            </a>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Source</th>
+                                            <th>Created On</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="documents" t-as="document">
+                                            <tr>
+                                                <td><a t-attf-href="/my/documents/#{document.id}"><t t-esc="document.name"/></a></td>
+                                                <td><t t-esc="document_portal_controller._get_document_source_name(document)"/></td>
+                                                <td><t t-esc="document.create_date"/></td>
+                                                <td><a t-attf-href="/web/content/#{document.id}?download=true" class="btn btn-primary btn-sm">Download</a></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div t-if="pager" class="o_portal_pager text-center">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                        <t t-else="">
+                            <div class="alert alert-info mt-3" role="alert">
+                                No documents found.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

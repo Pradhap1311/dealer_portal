@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="portal_my_opportunities" name="My Opportunities">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div id="wrap" class="oe_structure">
+                    <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                        <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                        <li class="breadcrumb-item active">Opportunities</li>
+                    </ol>
+                    <div class="container">
+                        <h1 class="mb-3">My Opportunities</h1>
+
+                        <div class="row content-group">
+                            <t t-foreach="searchbar_filters" t-as="stage_id">
+                                <t t-if="stage_id != 'all'">
+                                    <div class="col-lg-3 col-md-6 mb-4">
+                                        <a t-att-href="url_for('/my/opportunities') + (('?' + keep_query(filterby=stage_id, search=search, search_in=search_in, sortby=sortby)) if keep_query(filterby=stage_id, search=search, search_in=search_in, sortby=sortby) else '?filterby=' + stage_id)" class="text-decoration-none">
+                                            <div t-attf-class="card border-primary shadow h-100 py-2 #{'border-info' if filterby == stage_id else ''}">
+                                                <div class="card-body">
+                                                    <div class="row no-gutters align-items-center">
+                                                        <div class="col mr-2">
+                                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1"><t t-esc="searchbar_filters[stage_id]['label']"/></div>
+                                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="stage_counts[stage_id]"/>
+                                                        </div>
+                                                        <div class="col-auto">
+                                                            <i class="fa fa-lightbulb-o fa-2x text-gray-300"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+
+                        <div t-if="opportunities" class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="panel-title">Opportunities</h3>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <div class="o_portal_searchbar">
+                                            <form class="o_portal_searchbar_form d-flex" method="get" action="/my/opportunities">
+                                                <div class="input-group me-2">
+                                                    <input type="text" class="form-control" name="search" t-att-value="search" placeholder="Search..."/>
+                                                    <select class="form-control flex-grow-0 w-auto" name="search_in" t-att-value="search_in">
+                                                        <option value="content">Opportunity</option>
+                                                        <option value="partner">Customer</option>
+                                                        <option value="stage">Stage</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                                        <span class="fa fa-sort-amount-asc"/>
+                                                        <span class="d-none d-md-inline">Sort by:</span>
+                                                        <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                                    </a>
+                                                    <div class="dropdown-menu" role="menu">
+                                                        <t t-foreach="searchbar_sortings" t-as="sort_id">
+                                                            <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/opportunities') + (('?' + keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id)) if keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id) else '')">
+                                                                <t t-esc="searchbar_sortings[sort_id]['label']"/>
+                                                            </a>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Opportunity</th>
+                                            <th>Customer</th>
+                                            <th>Expected Closing</th>
+                                            <th>Stage</th>
+                                            <th>Expected Revenue</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="opportunities" t-as="opportunity">
+                                            <tr>
+                                                <td><a t-attf-href="/my/opportunities/#{opportunity.id}"><t t-esc="opportunity.name"/></a></td>
+                                                <td><t t-esc="opportunity.partner_id.name"/></td>
+                                                <td><t t-esc="opportunity.date_deadline"/></td>
+                                                <td><span t-field="opportunity.stage_id"/></td>
+                                                <td><t t-esc="opportunity.expected_revenue" t-options='{"widget": "monetary", "display_currency": opportunity.company_currency}'/></td>
+                                                <td><a t-attf-href="/my/opportunities/#{opportunity.id}" class="btn btn-primary btn-sm">View</a></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div t-if="pager" class="o_portal_pager text-center">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                        <t t-else="">
+                            <div class="alert alert-info mt-3" role="alert">
+                                No opportunities found.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="portal_my_opportunity_page" name="My Opportunity">
+            <t t-call="portal.portal_layout">
+                <t t-set="breadcrumbs_searchbar" t-value="True"/>
+                <div id="wrap" class="oe_structure">
+                    <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
+                        <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+                        <li class="breadcrumb-item"><a href="/my/opportunities">Opportunities</a></li>
+                        <li class="breadcrumb-item active"><t t-esc="opportunity.name"/></li>
+                    </ol>
+                    <div class="container">
+                        <h1 class="mb-3">Opportunity: <t t-esc="opportunity.name"/></h1>
+
+                        <div class="card">
+                            <div class="card-header">
+                                Opportunity Details
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Name:</strong> <t t-esc="opportunity.name"/><br/>
+                                        <strong>Customer:</strong> <t t-esc="opportunity.partner_id.name"/><br/>
+                                        <strong>Stage:</strong> <span t-field="opportunity.stage_id"/><br/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Expected Revenue:</strong> <t t-esc="opportunity.expected_revenue" t-options='{"widget": "monetary", "display_currency": opportunity.company_currency}'/><br/>
+                                        <strong>Expected Closing:</strong> <t t-esc="opportunity.date_deadline"/><br/>
+                                        <strong>Salesperson:</strong> <t t-esc="opportunity.user_id.name"/><br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="/my/opportunities" class="btn btn-primary">Back to Opportunities</a>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

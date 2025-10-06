@@ -96,12 +96,12 @@
                                         <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                             <i class="fa fa-credit-card fa-3x text-info mb-3"></i>
                                             <h5 class="card-title text-uppercase text-muted mb-0">Payments</h5>
-                                            <p class="card-text fs-2 fw-bold text-dark" t-esc="payments_count"/>
+                                            <p class="card-text fs-2 fw-bold text-dark" t-esc="draft_invoice_count"/>
                                         </div>
                                     </div>
                                 </a>
                             </div>
-                            <t t-if="user_id and user_id.has_group('base.group_system')">
+                            <t t-if="user_id and user_id.has_group('base.group_system') and is_crm_installed">
                                 <div class="col-lg-3 col-md-6 mb-4">
                                     <a href="/my/purchase" class="text-decoration-none">
                                         <div class="card border-0 shadow-sm h-100">
@@ -130,7 +130,7 @@
                                             <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                                 <i class="fa fa-lightbulb-o fa-3x text-warning mb-3"></i>
                                                 <h5 class="card-title text-uppercase text-muted mb-0">Opportunities</h5>
-                                                <p class="card-text fs-2 fw-bold text-dark"></p>
+                                                <p class="card-text fs-2 fw-bold text-dark" t-esc="opportunities_count"/>
                                             </div>
                                         </div>
                                     </a>
@@ -141,7 +141,7 @@
                                             <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                                                 <i class="fa fa-folder-open-o fa-3x text-info mb-3"></i>
                                                 <h5 class="card-title text-uppercase text-muted mb-0">Documents</h5>
-                                                <p class="card-text fs-2 fw-bold text-dark"></p>
+                                                <p class="card-text fs-2 fw-bold text-dark" t-esc="documents_count"/>
                                             </div>
                                         </div>
                                     </a>

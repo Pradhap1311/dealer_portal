@@ -39,6 +39,8 @@
         'views/mrp_workorder_views.xml',
         'views/purchase_portal_templates.xml',
         'views/vendor_bill_portal_templates.xml',
+        'views/opportunity_portal_templates.xml', # Added new template
+        'views/document_portal_templates.xml', # Added new template
     ],
     'installable': True,
     'application': True,
