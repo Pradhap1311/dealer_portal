@@ -23,6 +23,7 @@
                                         <option value="customer">Customer</option>
                                     </select>
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                    <a t-attf-href="/my/orders?clear_filter=True" class="btn btn-secondary ms-2">Clear Filter</a>
                                 </div>
                                 <div class="dropdown">
                                     <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">

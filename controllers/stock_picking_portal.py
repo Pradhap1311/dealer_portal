@@ -10,7 +10,7 @@ class StockPickingPortal(CustomerPortal):
     def portal_my_receipt_update(self, receipt_id, **kw):
         try:
             receipt = request.env['stock.picking'].browse(receipt_id)
-            if not receipt.exists() or receipt.partner_id != request.env.user.partner_id:
+            if not receipt.exists() or (not request.env.user.has_group('base.group_system') and receipt.partner_id != request.env.user.partner_id):
                 return request.redirect('/my/')
 
             # Update the scheduled date

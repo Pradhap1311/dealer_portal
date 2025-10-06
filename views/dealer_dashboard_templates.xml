@@ -99,110 +99,210 @@
                         </div>
 
                         <!-- Receipts -->
-                        <t t-if="user_id and user_id.has_group('base.group_system')">
-                            <div class="col-lg-3 col-md-6 mb-4">
-                                <a href="/my/receipts" class="text-decoration-none">
-                                    <div class="card border-success shadow h-100 py-2">
-                                        <div class="card-body">
-                                            <div class="row no-gutters align-items-center">
-                                                <div class="col mr-2">
-                                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Receipts</div>
-                                                    <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="receipt_count"/>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <i class="fa fa-truck fa-2x text-gray-300"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </t>
-
-                        <!-- Not Paid Invoices -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-danger shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Not Paid Invoices</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="not_paid_invoices_count"/>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fa fa-credit-card fa-2x text-gray-300"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Partially Paid Invoices -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Partially Paid Invoices</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="partial_paid_invoices_count"/>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fa fa-money fa-2x text-gray-300"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Paid Invoices -->
                         <div class="col-lg-3 col-md-6 mb-4">
                             <div class="card border-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Invoices</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="paid_invoices_count"/>
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Receipts</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="receipt_count"/>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fa fa-check-circle fa-2x text-gray-300"/>
+                                            <i class="fa fa-truck fa-2x text-gray-300"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- In Payment Invoices -->
+                        <!-- Vendor Bills (Draft) -->
                         <div class="col-lg-3 col-md-6 mb-4">
                             <div class="card border-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">In Payment Invoices</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="in_payment_invoices_count"/>
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Draft Vendor Bills</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_draft_count"/>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fa fa-hourglass-half fa-2x text-gray-300"/>
+                                            <i class="fa fa-file-text-o fa-2x text-gray-300"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Reversed Invoices -->
+                        <!-- Vendor Bills (Posted) -->
                         <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="card border-secondary shadow h-100 py-2">
+                            <div class="card border-primary shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Reversed Invoices</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="reversed_invoices_count"/>
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Posted Vendor Bills</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_posted_count"/>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fa fa-undo fa-2x text-gray-300"/>
+                                            <i class="fa fa-file-text-o fa-2x text-gray-300"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Vendor Bills (Paid) -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Paid Vendor Bills</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_paid_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-file-text-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vendor Bills (Cancelled) -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Cancelled Vendor Bills</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="vendor_bill_cancelled_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-file-text-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opportunities -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Opportunities</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="opportunity_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-lightbulb-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Documents -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Documents</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="document_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-file-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase RFQ -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Purchase RFQ</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="purchase_rfq_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-file-text-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Quotes Sent -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Purchase Quotes Sent</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="purchase_quotes_sent_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-envelope-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Confirmed Orders -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Purchase Confirmed Orders</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="purchase_confirmed_orders_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-check-square-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Cancelled Orders -->
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card border-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Purchase Cancelled Orders</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="purchase_cancelled_orders_count"/>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-times-circle-o fa-2x text-gray-300"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Count (Admin Only) -->
+                        <t t-if="user_id and user_id.has_group('base.group_system')">
+                            <div class="col-lg-3 col-md-6 mb-4">
+                                <div class="card border-primary shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800" t-esc="user_count"/>
+                                            </div>
+                                            <div class="col-auto">
+                                                <i class="fa fa-users fa-2x text-gray-300"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
                     </div>
 
                     <!-- You can add more sections here, e.g., recent orders, production status, etc. -->

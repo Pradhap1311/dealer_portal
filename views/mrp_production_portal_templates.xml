@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template id="portal_my_manufacturing_orders" name="My Manufacturing Orders">
+        <template id="portal_my_mrp_productions" name="My Manufacturing Orders">
             <t t-call="portal.portal_layout">
                 <t t-set="breadcrumbs_searchbar" t-value="True"/>
                 <div id="wrap" class="oe_structure">
@@ -22,12 +22,18 @@
                                             <option value="product">Product</option>
                                         </select>
                                         <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                        <a t-attf-href="/my/manufacturing?clear_filter=True" class="btn btn-secondary ms-2">Clear Filter</a>
                                     </div>
                                     <div class="dropdown">
                                         <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
                                             <span class="fa fa-sort-amount-asc"/>
                                             <span class="d-none d-md-inline">Sort by:</span>
-                                            <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                            <t t-if="sortby and sortby in searchbar_sortings">
+                                                <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-esc="searchbar_sortings['date']['label']"/>
+                                            </t>
                                         </a>
                                         <div class="dropdown-menu" role="menu">
                                             <t t-foreach="searchbar_sortings" t-as="sort_id">

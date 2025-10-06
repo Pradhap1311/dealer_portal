@@ -51,9 +51,18 @@ class OpportunityPortal(CustomerPortal):
         AccountPayment = request.env['account.payment'].sudo()
         AccountMove = request.env['account.move'].sudo()
         
-        payments_count = AccountPayment.search_count([('partner_id', '=', partner.id)])
-        vendor_bill_draft_count = AccountMove.search_count([('partner_id', '=', partner.id), ('move_type', '=', 'in_invoice'), ('state', '=', 'draft')])
-        vendor_bill_posted_count = AccountMove.search_count([('partner_id', '=', partner.id), ('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
+        if request.env.user.has_group('base.group_system'):
+            payments_count = AccountPayment.search_count([])
+        else:
+            payments_count = AccountPayment.search_count([('partner_id', '=', partner.id)])
+        if request.env.user.has_group('base.group_system'):
+            vendor_bill_draft_count = AccountMove.search_count([('move_type', '=', 'in_invoice'), ('state', '=', 'draft')])
+        else:
+            vendor_bill_draft_count = AccountMove.search_count([('partner_id', '=', partner.id), ('move_type', '=', 'in_invoice'), ('state', '=', 'draft')])
+        if request.env.user.has_group('base.group_system'):
+            vendor_bill_posted_count = AccountMove.search_count([('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
+        else:
+            vendor_bill_posted_count = AccountMove.search_count([('partner_id', '=', partner.id), ('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
         
         values.qcontext['payments_count'] = payments_count
         values.qcontext['vendor_bill_draft_count'] = vendor_bill_draft_count
@@ -90,7 +99,7 @@ class OpportunityPortal(CustomerPortal):
         return filters
 
     @http.route(['/my/opportunities', '/my/opportunities/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_opportunities(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
+    def portal_my_opportunities(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', clear_filter=False, **kw):
         is_crm_installed = bool(request.env['ir.module.module'].sudo().search([('name', '=', 'crm'), ('state', '=', 'installed')]))
         if not is_crm_installed:
             return request.render("http_routing.404") # Or a custom message
@@ -98,6 +107,10 @@ class OpportunityPortal(CustomerPortal):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         CrmLead = request.env['crm.lead'].sudo()
+
+        if clear_filter:
+            filterby = None
+            search = None
 
         base_domain = [
             ('type', '=', 'opportunity'),

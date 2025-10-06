@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_procurement_group_portal,procurement.group.portal,stock.model_procurement_group,base.group_portal,1,0,0,0
-access_stock_picking_portal,stock.picking.portal,stock.model_stock_picking,base.group_portal,1,1,0,0
+access_mrp_production_admin,access.mrp.production.admin,model_mrp_production,base.group_system,1,1,1,1
+access_sale_order_admin,access.sale.order.admin,model_sale_order,base.group_system,1,1,1,1
+access_stock_picking_admin,access.stock.picking.admin,model_stock_picking,base.group_system,1,1,1,1
+access_mrp_workorder_admin,access.mrp.workorder.admin,model_mrp_workorder,base.group_system,1,1,1,1
