@@ -32,6 +32,8 @@
         'views/mrp_production_portal_templates.xml',
         'views/delivery_status_cards.xml',
         'views/stock_picking_portal_templates.xml',
+        'views/receipt_status_cards.xml',
+        'views/receipt_portal_templates.xml',
         'views/payment_status_cards.xml',
         'views/portal_payments_templates.xml',
         'views/sale_order_portal_page_templates.xml',

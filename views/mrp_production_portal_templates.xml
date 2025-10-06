@@ -12,7 +12,33 @@
                     <div class="container">
                         <t t-call="dealer_portal.mrp_status_cards"/>
 
-                        <div t-if="filterby" class="mt-4">
+                        <div class="mt-4">
+                            <div class="o_portal_searchbar">
+                                <form class="o_portal_searchbar_form d-flex" method="get" action="/my/manufacturing">
+                                    <div class="input-group me-2">
+                                        <input type="text" class="form-control" name="search" t-att-value="search" placeholder="Search..."/>
+                                        <select class="form-control flex-grow-0 w-auto" name="search_in" t-att-value="search_in">
+                                            <option value="content">Reference</option>
+                                            <option value="product">Product</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"/></button>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                                            <span class="fa fa-sort-amount-asc"/>
+                                            <span class="d-none d-md-inline">Sort by:</span>
+                                            <t t-esc="searchbar_sortings[sortby]['label']"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <t t-foreach="searchbar_sortings" t-as="sort_id">
+                                                <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/manufacturing') + (('?' + keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id)) if keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id) else '')">
+                                                    <t t-esc="searchbar_sortings[sort_id]['label']"/>
+                                                </a>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                             <h3 class="mb-3" t-esc="current_filter_name"/>
                             <div t-if="mrp_productions" class="table-responsive">
                                 <table class="table table-hover table-striped">
@@ -41,14 +67,11 @@
                                 </table>
                             </div>
                             <div t-else="" class="alert alert-info mt-3" role="alert">
-                                No manufacturing orders found for this status.
+                                No manufacturing orders found.
                             </div>
                             <div t-if="pager" class="o_portal_pager text-center">
                                 <t t-call="portal.pager"/>
                             </div>
-                        </div>
-                        <div t-else="" class="alert alert-info mt-3" role="alert">
-                            Select a status card above to view manufacturing orders.
                         </div>
                     </div>
                 </div>

@@ -62,6 +62,18 @@ class DealerPortal(CustomerPortal):
         cancel_delivery_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
         _logger.info("Dealer Portal Dashboard - _prepare_home_portal_values - cancel_delivery_count: %s", cancel_delivery_count)
 
+        # Receipt Counts (Incoming Pickings)
+        receipt_count = request.env['stock.picking'].sudo().search_count([
+            ('partner_id', '=', partner.id),
+            ('picking_type_code', '=', 'incoming'),
+        ])
+        draft_receipt_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'draft')])
+        waiting_receipt_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'waiting')])
+        ready_receipt_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'assigned')])
+        done_receipt_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'done')])
+        cancel_receipt_count = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'cancel')])
+
+
         draft_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
         open_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
         paid_invoice_count = request.env['account.move'].sudo().search_count([('partner_id', 'child_of', [partner.commercial_partner_id.id]), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
@@ -114,6 +126,12 @@ class DealerPortal(CustomerPortal):
             'ready_delivery_count': ready_delivery_count,
             'done_delivery_count': done_delivery_count,
             'cancel_delivery_count': cancel_delivery_count,
+            'receipt_count': receipt_count,
+            'draft_receipt_count': draft_receipt_count,
+            'waiting_receipt_count': waiting_receipt_count,
+            'ready_receipt_count': ready_receipt_count,
+            'done_receipt_count': done_receipt_count,
+            'cancel_receipt_count': cancel_receipt_count,
             'payments_count': payments_count,
             'draft_invoice_count': draft_invoice_count,
             'open_invoice_count': open_invoice_count,
@@ -131,9 +149,10 @@ class DealerPortal(CustomerPortal):
         return values
 
     @http.route(['/my/manufacturing', '/my/manufacturing/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_manufacturing_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+    def portal_my_manufacturing_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
+        MrpProduction = request.env['mrp.production'] # Define MrpProduction here
 
         domain = [('partner_id', '=', partner.id)]
 
@@ -155,26 +174,45 @@ class DealerPortal(CustomerPortal):
         else:
             values['current_filter_name'] = 'All Manufacturing Orders'
 
+        # Apply search
+        if search and search_in:
+            if search_in == 'content':
+                domain += ['|', ('name', 'ilike', search), ('product_id.name', 'ilike', search)]
+            elif search_in == 'product':
+                domain += [('product_id.name', 'ilike', search)]
+
+        # Resolve sortby
+        if not sortby:
+            sortby = 'date' # Default sortby
+
         # Count for status cards
-        values['draft_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'draft')])
-        values['confirmed_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'confirmed')])
-        values['progress_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'progress')])
-        values['done_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'done')])
-        values['cancel_mo_count'] = request.env['mrp.production'].sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'cancel')])
+        values['draft_mo_count'] = MrpProduction.sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'draft')])
+        values['confirmed_mo_count'] = MrpProduction.sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'confirmed')])
+        values['progress_mo_count'] = MrpProduction.sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'progress')])
+        values['done_mo_count'] = MrpProduction.sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'done')])
+        values['cancel_mo_count'] = MrpProduction.sudo().search_count([('partner_id', '=', partner.id), ('state', '=', 'cancel')])
 
         # Paging
-        mrp_productions_count = request.env['mrp.production'].sudo().search_count(domain)
-        pager = request.website.pager(url='/my/manufacturing', total=mrp_productions_count, page=page, step=self._items_per_page)
-        mrp_productions = request.env['mrp.production'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+        mrp_productions_count = MrpProduction.sudo().search_count(domain)
+        pager = request.website.pager(
+            url='/my/manufacturing',
+            total=mrp_productions_count,
+            page=page,
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search, 'search_in': search_in}
+        )
+        mrp_productions = MrpProduction.sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'mrp_productions': mrp_productions,
             'page_name': 'manufacturing',
             'pager': pager,
             'default_url': '/my/manufacturing',
-            'searchbar_sortings': self._get_mrp_sortings(), # Need to define this method
+            'searchbar_sortings': self._get_mrp_sortings(),
             'sortby': sortby,
             'filterby': filterby,
+            'search': search,
+            'search_in': search_in, # Pass search_in to the template
         })
         return request.render("dealer_portal.portal_my_manufacturing_orders", values)
 
@@ -192,13 +230,13 @@ class DealerPortal(CustomerPortal):
         return request.render("dealer_portal.portal_my_manufacturing_order_page", values)
 
     @http.route(['/my/delivery', '/my/delivery/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_delivery_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+    def portal_my_delivery_orders(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
+        StockPicking = request.env['stock.picking'] # Define StockPicking here
         _logger.info("Portal My Delivery Orders - Partner ID: %s", partner.id)
 
         domain = [('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing')]
-        _logger.info("Portal My Delivery Orders - Initial Domain: %s", domain)
 
         if filterby == 'draft':
             domain += [('state', '=', 'draft')]
@@ -218,26 +256,45 @@ class DealerPortal(CustomerPortal):
         else:
             values['current_filter_name'] = 'All Deliveries'
 
+        # Apply search
+        if search and search_in:
+            if search_in == 'content':
+                domain += ['|', ('name', 'ilike', search), ('origin', 'ilike', search)]
+            elif search_in == 'partner':
+                domain += [('partner_id', 'ilike', search)]
+
+        # Resolve sortby
+        if not sortby:
+            sortby = 'date' # Default sortby
+
         # Count for status cards
-        values['draft_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'draft')])
-        values['waiting_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'waiting')])
-        values['ready_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'assigned')])
-        values['done_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'done')])
-        values['cancel_delivery_count'] = request.env['stock.picking'].sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
+        values['draft_delivery_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'draft')])
+        values['waiting_delivery_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'waiting')])
+        values['ready_delivery_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'assigned')])
+        values['done_delivery_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'done')])
+        values['cancel_delivery_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'outgoing'), ('state', '=', 'cancel')])
 
         # Paging
-        delivery_orders_count = request.env['stock.picking'].sudo().search_count(domain)
-        pager = request.website.pager(url='/my/delivery', total=delivery_orders_count, page=page, step=self._items_per_page)
-        delivery_orders = request.env['stock.picking'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+        delivery_orders_count = StockPicking.sudo().search_count(domain)
+        pager = request.website.pager(
+            url='/my/delivery',
+            total=delivery_orders_count,
+            page=page,
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search, 'search_in': search_in}
+        )
+        delivery_orders = StockPicking.sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'delivery_orders': delivery_orders,
             'page_name': 'delivery',
             'pager': pager,
             'default_url': '/my/delivery',
-            'searchbar_sortings': self._get_delivery_sortings(), # Need to define this method
+            'searchbar_sortings': self._get_delivery_sortings(),
             'sortby': sortby,
             'filterby': filterby,
+            'search': search,
+            'search_in': search_in, # Pass search_in to the template
         })
         return request.render("dealer_portal.portal_my_delivery_orders", values)
 
@@ -254,14 +311,105 @@ class DealerPortal(CustomerPortal):
         })
         return request.render("dealer_portal.portal_my_delivery_order_page", values)
 
-    @http.route(['/my/payments', '/my/payments/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_payments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+    @http.route(['/my/receipts', '/my/receipts/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_receipts(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
-        _logger.info("Portal My Payments - Partner ID: %s", partner.id)
+        StockPicking = request.env['stock.picking']
+
+        domain = [('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming')]
+
+        if filterby == 'draft':
+            domain += [('state', '=', 'draft')]
+            values['current_filter_name'] = 'Draft Receipts'
+        elif filterby == 'waiting':
+            domain += [('state', '=', 'waiting')]
+            values['current_filter_name'] = 'Waiting Receipts'
+        elif filterby == 'assigned':
+            domain += [('state', '=', 'assigned')]
+            values['current_filter_name'] = 'Ready Receipts'
+        elif filterby == 'done':
+            domain += [('state', '=', 'done')]
+            values['current_filter_name'] = 'Done Receipts'
+        elif filterby == 'cancel':
+            domain += [('state', '=', 'cancel')]
+            values['current_filter_name'] = 'Cancelled Receipts'
+        else:
+            values['current_filter_name'] = 'All Receipts'
+
+        # Apply search
+        if search and search_in:
+            if search_in == 'content':
+                domain += ['|', ('name', 'ilike', search), ('origin', 'ilike', search)]
+            elif search_in == 'partner':
+                domain += [('partner_id', 'ilike', search)]
+
+        # Resolve sortby
+        if not sortby:
+            sortby = 'date' # Default sortby
+
+        # Count for status cards
+        values['draft_receipt_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'draft')])
+        values['waiting_receipt_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'waiting')])
+        values['ready_receipt_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'assigned')])
+        values['done_receipt_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'done')])
+        values['cancel_receipt_count'] = StockPicking.sudo().search_count([('partner_id', '=', partner.id), ('picking_type_code', '=', 'incoming'), ('state', '=', 'cancel')])
+
+        # Paging
+        receipt_orders_count = StockPicking.sudo().search_count(domain)
+        pager = request.website.pager(
+            url='/my/receipts',
+            total=receipt_orders_count,
+            page=page,
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search, 'search_in': search_in}
+        )
+        receipt_orders = StockPicking.sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+
+        values.update({
+            'receipt_orders': receipt_orders,
+            'page_name': 'receipts',
+            'pager': pager,
+            'default_url': '/my/receipts',
+            'searchbar_sortings': self._get_delivery_sortings(), # Re-using delivery sortings for now
+            'sortby': sortby,
+            'filterby': filterby,
+            'search': search,
+            'search_in': search_in,
+        })
+        return request.render("dealer_portal.portal_my_receipts", values)
+
+    @http.route(['/my/receipts/<int:receipt_id>'], type='http', auth="user", website=True)
+    def portal_my_receipt_detail(self, receipt_id, **kw):
+        try:
+            receipt_order = request.env['stock.picking'].browse([receipt_id]).sudo().read(['name', 'scheduled_date', 'state', 'origin', 'move_ids_without_package', 'partner_id'])[0]
+        except (
+            AccessError,
+            MissingError
+        ):
+            return request.redirect('/my')
+
+        if not receipt_order or receipt_order['partner_id'][0] != request.env.user.partner_id.id:
+            return request.redirect('/my')
+
+        # Fetch the stock.move records and their product details
+        moves = request.env['stock.move'].sudo().browse(receipt_order['move_ids_without_package']).read(['product_id', 'product_uom_qty', 'product_uom', 'state'])
+
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'receipt_order': receipt_order,
+            'moves': moves,
+            'page_name': 'receipt_detail',
+        })
+        return request.render("dealer_portal.portal_my_receipt_detail", values)
+
+    @http.route(['/my/payments', '/my/payments/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_payments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, search=None, search_in='content', **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        AccountMove = request.env['account.move'] # Define AccountMove here
 
         domain = [('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice')]
-        _logger.info("Portal My Payments - Initial Domain: %s", domain)
 
         if filterby == 'draft':
             domain += [('state', '=', 'draft')]
@@ -278,25 +426,44 @@ class DealerPortal(CustomerPortal):
         else:
             values['current_filter_name'] = 'All Invoices'
 
+        # Apply search
+        if search and search_in:
+            if search_in == 'content':
+                domain += ['|', ('name', 'ilike', search), ('ref', 'ilike', search)]
+            elif search_in == 'customer':
+                domain += [('partner_id', 'ilike', search)]
+
+        # Resolve sortby
+        if not sortby:
+            sortby = 'date' # Default sortby
+
         # Count for status cards
-        values['draft_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
-        values['open_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
-        values['paid_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
-        values['cancel_invoice_count'] = request.env['account.move'].sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
+        values['draft_invoice_count'] = AccountMove.sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'draft')])
+        values['open_invoice_count'] = AccountMove.sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])])
+        values['paid_invoice_count'] = AccountMove.sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'paid')])
+        values['cancel_invoice_count'] = AccountMove.sudo().search_count([('partner_id', '=', partner.id), ('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')])
 
         # Paging
-        invoices_count = request.env['account.move'].sudo().search_count(domain)
-        pager = request.website.pager(url='/my/payments', total=invoices_count, page=page, step=self._items_per_page)
-        invoices = request.env['account.move'].sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
+        invoices_count = AccountMove.sudo().search_count(domain)
+        pager = request.website.pager(
+            url='/my/payments',
+            total=invoices_count,
+            page=page,
+            step=self._items_per_page,
+            url_args={'sortby': sortby, 'filterby': filterby, 'search': search, 'search_in': search_in}
+        )
+        invoices = AccountMove.sudo().search(domain, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'invoices': invoices,
             'page_name': 'payments',
             'pager': pager,
             'default_url': '/my/payments',
-            'searchbar_sortings': self._get_payment_sortings(), # Need to define this method
+            'searchbar_sortings': self._get_payment_sortings(),
             'sortby': sortby,
             'filterby': filterby,
+            'search': search,
+            'search_in': search_in, # Pass search_in to the template
         })
         return request.render("dealer_portal.portal_my_payments", values)
 
@@ -340,6 +507,13 @@ class DealerPortal(CustomerPortal):
         domain = values.get('domain', [])
         order = values.get('order', 'create_date desc') # Ensure order is set
 
+        # Apply search
+        if search and search_in:
+            if search_in == 'content':
+                domain += ['|', ('name', 'ilike', search), ('client_order_ref', 'ilike', search)]
+            elif search_in == 'customer':
+                domain += [('partner_id', 'ilike', search)]
+
         _logger.info("Portal My Orders - Domain: %s, Order: %s", domain, order)
 
         # Paging
@@ -349,7 +523,7 @@ class DealerPortal(CustomerPortal):
             total=quotations_count,
             page=page,
             step=self._items_per_page,
-            url_args={'sortby': sortby, 'filterby': filterby, 'search': search}
+            url_args={'sortby': values.get('sortby'), 'filterby': filterby, 'search': search, 'search_in': search_in}
         )
 
         # Content according to pager and domain
@@ -362,9 +536,10 @@ class DealerPortal(CustomerPortal):
             'pager': pager,
             'default_url': '/my/orders',
             'searchbar_sortings': self._get_sale_sortings(),
-            'sortby': sortby,
+            'sortby': values.get('sortby'), # Use the resolved sortby
             'filterby': filterby,
             'search': search,
+            'search_in': search_in, # Pass search_in to the template
             'quote_count': values.get('quote_count'),
             'quote_sent_count': values.get('quote_sent_count'),
             'confirmed_orders_count': values.get('confirmed_orders_count'),

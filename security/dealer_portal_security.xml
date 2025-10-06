@@ -37,6 +37,17 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
+        <record id="stock_picking_receipt_dealer_portal_rule" model="ir.rule">
+            <field name="name">Receipt Dealer Portal User</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="domain_force">[('partner_id', '=', user.partner_id.id), ('picking_type_code', '=', 'incoming')]</field>
+            <field name="groups" eval="[(4, ref('dealer_portal.group_dealer_portal_user')), (4, ref('base.group_system'), 16)]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
         <record id="crm_lead_dealer_portal_rule" model="ir.rule">
             <field name="name">Opportunity Dealer Portal User</field>
             <field name="model_id" ref="crm.model_crm_lead"/>

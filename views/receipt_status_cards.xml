@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="receipt_status_cards" name="Receipt Status Cards">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/receipts?filterby=draft" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-file-text-o fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Draft Receipts</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="draft_receipt_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/receipts?filterby=waiting" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-hourglass-half fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Waiting Receipts</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="waiting_receipt_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/receipts?filterby=assigned" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-truck fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Ready Receipts</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="ready_receipt_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/receipts?filterby=done" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-check-circle-o fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Done Receipts</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="done_receipt_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <a href="/my/receipts?filterby=cancel" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                                    <i class="fa fa-times-circle-o fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Cancelled Receipts</h5>
+                                    <p class="card-text fs-2 fw-bold text-dark" t-esc="cancel_receipt_count"/>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

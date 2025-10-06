@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template id="portal_my_delivery_orders" name="My Delivery Orders">
+        <template id="portal_my_receipts" name="My Receipts">
             <t t-call="portal.portal_layout">
                 <t t-set="breadcrumbs_searchbar" t-value="True"/>
                 <div id="wrap" class="oe_structure">
                     <ol class="o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0">
                         <li class="breadcrumb-item ms-1"><a href="/my/home" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
-                        <li class="breadcrumb-item active">Delivery Orders</li>
+                        <li class="breadcrumb-item active">Receipts</li>
                     </ol>
                     <div class="container">
-                        <t t-call="dealer_portal.delivery_status_cards"/>
+                        <t t-call="dealer_portal.receipt_status_cards"/>
 
                         <div class="mt-4">
                             <div class="o_portal_searchbar">
-                                <form class="o_portal_searchbar_form d-flex" method="get" action="/my/delivery">
+                                <form class="o_portal_searchbar_form d-flex" method="get" action="/my/receipts">
                                     <div class="input-group me-2">
                                         <input type="text" class="form-control" name="search" t-att-value="search" placeholder="Search..."/>
                                         <select class="form-control flex-grow-0 w-auto" name="search_in" t-att-value="search_in">
@@ -31,7 +31,7 @@
                                         </a>
                                         <div class="dropdown-menu" role="menu">
                                             <t t-foreach="searchbar_sortings" t-as="sort_id">
-                                                <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/delivery') + (('?' + keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id)) if keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id) else '')">
+                                                <a role="menuitem" class="dropdown-item" t-att-href="url_for('/my/receipts') + (('?' + keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id)) if keep_query(search=search, search_in=search_in, filterby=filterby, sortby=sort_id) else '')">
                                                     <t t-esc="searchbar_sortings[sort_id]['label']"/>
                                                 </a>
                                             </t>
@@ -40,7 +40,7 @@
                                 </form>
                             </div>
                             <h3 class="mb-3" t-esc="current_filter_name"/>
-                            <div t-if="delivery_orders" class="table-responsive">
+                            <div t-if="receipt_orders" class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <thead>
                                         <tr>
@@ -52,20 +52,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <t t-foreach="delivery_orders" t-as="do">
+                                        <t t-foreach="receipt_orders" t-as="receipt">
                                             <tr>
-                                                <td><a t-attf-href="/my/delivery/#{do.id}"><t t-esc="do.name"/></a></td>
-                                                <td><t t-esc="do.partner_id.display_name"/></td>
-                                                <td><span t-field="do.scheduled_date"/></td>
-                                                <td><span t-field="do.state"/></td>
-                                                <td><a t-attf-href="/my/delivery/#{do.id}" class="btn btn-primary btn-sm">View</a></td>
+                                                <td><a t-attf-href="/my/receipts/#{receipt.id}"><t t-esc="receipt.name"/></a></td>
+                                                <td><t t-esc="receipt.partner_id.display_name"/></td>
+                                                <td><span t-field="receipt.scheduled_date"/></td>
+                                                <td><span t-field="receipt.state"/></td>
+                                                <td><a t-attf-href="/my/receipts/#{receipt.id}" class="btn btn-primary btn-sm">View</a></td>
                                             </tr>
                                         </t>
                                     </tbody>
                                 </table>
                             </div>
                             <div t-else="" class="alert alert-info mt-3" role="alert">
-                                No delivery orders found.
+                                No receipts found.
                             </div>
                             <div t-if="pager" class="o_portal_pager text-center">
                                 <t t-call="portal.pager"/>
@@ -76,24 +76,43 @@
             </t>
         </template>
 
-        <template id="portal_my_delivery_order_page" name="My Delivery Order Page">
+        <template id="portal_my_receipt_detail" name="My Receipt Detail Page">
             <t t-call="portal.portal_layout">
                 <div id="wrap" class="oe_structure">
                     <div class="o_portal_return_sidebar mb-3">
-                        <a href="/my/delivery" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back to Delivery Orders</a>
+                        <a href="/my/receipts" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Back to Receipts</a>
                     </div>
                     <div class="container">
                         <div class="row mt-4">
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0">Delivery Order Details</h5>
+                                        <h5 class="mb-0">Receipt Details</h5>
                                     </div>
                                     <div class="card-body">
-                                        <p><strong>Reference:</strong> <span t-field="delivery_order.name"/></p>
-                                        <p><strong>Partner:</strong> <span t-field="delivery_order.partner_id.display_name"/></p>
-                                        <p><strong>Scheduled Date:</strong> <span t-field="delivery_order.scheduled_date"/></p>
-                                        <p><strong>Status:</strong> <span t-field="delivery_order.state"/></p>
+                                        <p><strong>Reference:</strong> <span t-field="receipt_order.name"/></p>
+                                        <p><strong>Partner:</strong> <span t-field="receipt_order.partner_id.display_name"/></p>
+                                        <p><strong>Scheduled Date:</strong> <span t-field="receipt_order.scheduled_date"/></p>
+                                        <p><strong>Status:</strong> <span t-field="receipt_order.state"/></p>
+                                        <h6 class="mt-4">Products:</h6>
+                                        <t t-if="receipt_order.move_ids_without_package">
+                                            <ul class="list-group mb-3">
+                                                <t t-foreach="receipt_order.move_ids_without_package" t-as="move">
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <strong>Product:</strong> <t t-esc="move.product_id.display_name"/>
+                                                        </div>
+                                                        <div>
+                                                            <strong>Quantity:</strong> <t t-esc="move.product_uom_qty"/> <t t-esc="move.product_uom.name"/>
+                                                        </div>
+                                                        <span class="badge bg-primary rounded-pill"><t t-esc="move.state"/></span>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </t>
+                                        <t t-else="">
+                                            <p>No products in this receipt.</p>
+                                        </t>
                                     </div>
                                 </div>
                             </div>
@@ -102,6 +121,5 @@
                 </div>
             </t>
         </template>
-
     </data>
 </odoo>
